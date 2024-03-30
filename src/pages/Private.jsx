@@ -4,6 +4,9 @@ import { useSelector } from 'react-redux';
 import { Loading } from '../components/Loading';
 import HomePage from './HomePage';
 import { Route, Routes } from 'react-router-dom';
+import TallerPage from './TallerPage';
+import InformePage from './InformePage';
+import AdministradorPage from './AdministradorPage';
 
 const Private = () => {
 
@@ -31,9 +34,9 @@ const Private = () => {
         <AppLayout>
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                {/* <Route path="/taller" element={<TallerPage />} />
+                <Route path="/taller" element={<TallerPage />} />
                 <Route path="/informe" element={<InformePage />} />
-                <Route path="/administrador" element={<AdministradorPage />} /> */}
+                <Route path="/administrador" element={<AdministradorPage />} />
             </Routes>
         </AppLayout>
     )
