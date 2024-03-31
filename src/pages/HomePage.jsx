@@ -1,20 +1,26 @@
-import React from 'react';
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
-const { Header, Content, Footer, Sider } = Layout;
-const items = [UserOutlined, VideoCameraOutlined, UploadOutlined, UserOutlined].map(
-  (icon, index) => ({
-    key: String(index + 1),
-    icon: React.createElement(icon),
-    label: `nav ${index + 1}`,
-  }),
-);
+import { Card, Col, Row,} from 'antd';
+
 const HomePage = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
   return (
-    <>HOLA</>
+    <div>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>
+            Card content
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };
 export default HomePage;

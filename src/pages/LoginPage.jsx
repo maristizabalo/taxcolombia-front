@@ -29,7 +29,7 @@ const Login = () => {
       user['auth_tokens'] = result;
       dispatch(createUser(user));
       openNotificationWithIcon(notification, 'success', 'Inicio de sesión exitoso', '', 4);
-      navigate('/');
+      navigate('/private');
     } catch (error) {
       openNotificationWithIcon(notification, 'error', 'Verifica tu usuario y clave, si el error continúa contacta con el administrador.', '', 4);
     }
