@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router-dom';
 import TallerPage from './TallerPage';
 import InformePage from './InformePage';
 import AdministradorPage from './AdministradorPage';
+import NotasPage from './NotasPage';
 
 const Private = () => {
 
@@ -35,6 +36,7 @@ const Private = () => {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/taller" element={<TallerPage />} />
+                <Route path="/notas" element={<NotasPage />} />
                 <Route path="/informe" element={<InformePage />} />
                 <Route path="/administrador" element={<AdministradorPage />} />
             </Routes>
