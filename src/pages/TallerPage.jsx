@@ -1,6 +1,6 @@
 import { Button, Card, Col, DatePicker, Form, Input, Modal, Row, Select, TimePicker, notification } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { carListService, createMantenimientoService, mantenimientoListService } from '../services/carService';
+import { carListService, createMantenimientoService, createMecanicoService, mantenimientoListService } from '../services/carService';
 import { useEffect, useState } from 'react';
 import { MOTIVO } from "../utils/const";
 import { openNotificationWithIcon } from "../utils/notification";
@@ -15,6 +15,7 @@ const TallerPage = () => {
   const [mecanicoModalVisible, setMecanicoModalVisible] = useState(false)
   const [filteredMantenimientos, setFilteredMantenimientos] = useState([]);
   const [formEntrada] = Form.useForm();
+  const [formMecanico] = Form.useForm();
   const userId = useSelector((store) => store.userInfo.user.user_id)
   console.log(userId)
 
@@ -72,6 +73,23 @@ const TallerPage = () => {
       await createMantenimientoService(payload);
       openNotificationWithIcon(notification, 'success', 'Entrada a taller registrada exitosamente', '', 4)
       setEntradaModalVisible(false);
+      fetchMantenimientos();
+    } catch (error) {
+      console.log(error)
+      openNotificationWithIcon(notification, 'error', 'Error al registrar entrada', '', 4)
+    }
+  };
+
+  const handleOkMecanico = async () => {
+    try {
+      const values = formMecanico.getFieldsValue();
+      const payload = {
+        nombre: values.nombre
+      };
+      console.log(payload)
+      await createMecanicoService(payload);
+      openNotificationWithIcon(notification, 'success', 'Entrada a taller registrada exitosamente', '', 4)
+      setMecanicoModalVisible(false);
       fetchMantenimientos();
     } catch (error) {
       console.log(error)
@@ -184,46 +202,13 @@ const TallerPage = () => {
       <Modal
         title="Agregar entrada al taller"
         open={mecanicoModalVisible}
-        onOk={handleOkEntrada}
+        onOk={handleOkMecanico}
         onCancel={() => setMecanicoModalVisible(false)}
       >
-        <Form form={formEntrada} initialValues={{ fecha_ingreso: moment(todayDate), motivo: '3' }}>
-          <Row gutter={16} >
-            <Col span={12}>
-              <Form.Item name="motivo" label="Motivo">
-                <Select>
-                  {Object.entries(MOTIVO).map(([key, value]) => (
-                    <Select.Option key={key} value={key}>{value}</Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item name="fecha_ingreso" label="Fecha de ingreso">
-                <DatePicker />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="vehiculo" label="Vehiculo">
-                <Select
-                  showSearch
-                  placeholder="Busca por movil o placa"
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                  }
-                >
-                  {cars.map(car => (
-                    <Select.Option key={car.id} value={car.id}>{`${car.placa} - ${car.movil}`}</Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item name="observacion" label="Observación">
+        <Form form={formMecanico}>
+              <Form.Item name="nombre" label="Nombre mecanico">
                 <Input />
               </Form.Item>
-              <Form.Item name="hora_ingreso" label="Hora de ingreso">
-                <TimePicker use12Hours format="h:mm A" minuteStep={30} hourStep={1} />
-              </Form.Item>
-            </Col>
-          </Row>
         </Form>
       </Modal>
     </div>

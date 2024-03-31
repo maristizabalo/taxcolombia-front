@@ -54,3 +54,12 @@ export const editMantenimientoService = async (id, values) => {
     }
 };
 
+export const createMecanicoService = async (values) => {
+    try {
+        const response = await api.post('mantenimiento/mecanico/', values)
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
