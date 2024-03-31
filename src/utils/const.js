@@ -6,8 +6,8 @@ export const ROLES = {
 }
 
 export const MOTIVO = {
-    QLZ: 0,
-    MOTOR: 1,
-    QR1: 2,
-    PERMISO: 3
-}
+    1: 'QLZ',
+    2: 'MOTOR',
+    3: 'QR1',
+    4: 'PERMISO'
+};

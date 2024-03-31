@@ -5,7 +5,7 @@ import PrivateRoute from './utils/PrivateRoute'
 import { Provider } from 'react-redux'
 import store from './redux/store'
 import Private from './pages/Private'
-
+import esES from 'antd/locale/es_ES'
 
 const App = () => {
   return (
@@ -15,6 +15,7 @@ const App = () => {
           colorPrimary: '#42BFF2',
         },
       }}
+      locale={esES}
     >
       <Provider store={store} >
         <Router>
