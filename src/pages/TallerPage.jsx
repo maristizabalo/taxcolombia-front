@@ -6,6 +6,7 @@ import { MOTIVO } from "../utils/const";
 import { openNotificationWithIcon } from "../utils/notification";
 import moment from 'moment';
 import { useSelector } from "react-redux";
+import dayjs from "dayjs";
 
 const TallerPage = () => {
   const [mantenimientos, setMantenimientos] = useState([])
@@ -75,11 +76,13 @@ const TallerPage = () => {
   const handleOkEntrada = async () => {
     try {
       const values = formEntrada.getFieldsValue();
+      const conDay = dayjs(values.fecha_ingreso).subtract(5, 'hours')
       const payload = {
         ...values,
+        fecha_ingreso: conDay,
         registrado_por: userId
-        
       };
+      console.log(conDay)
       await createMantenimientoService(payload);
       openNotificationWithIcon(notification, 'success', 'Entrada a taller registrada exitosamente', '', 4)
       setEntradaModalVisible(false);
@@ -177,15 +180,25 @@ const TallerPage = () => {
             <div key={mantenimiento.id} className="w-1/3 px-4 mb-4">
               <Card
                 className="hover:border-l-{fuchsia-700}"
-                title={mantenimiento.vehiculo_placa}
+                title={(<div>{mantenimiento.vehiculo_placa} - {MOTIVO[mantenimiento.motivo]}</div>)}
                 style={{
                   backgroundColor: mantenimiento.motivo === 1 ? '#FFF7E6' : mantenimiento.motivo === 2 ? '#FFE6E6' : '',
                 }}
               >
-                {mantenimiento.motivo && <div>Motivo: {MOTIVO[mantenimiento.motivo]}</div>}
-                {mantenimiento.observacion && <div>Observación: {mantenimiento.observacion}</div>}
-                {mantenimiento.fecha_ingreso && <div>Fecha de ingreso: {mantenimiento.fecha_ingreso}</div>}
-                {mantenimiento.hora_ingreso && <div>Hora de ingreso: {mantenimiento.hora_ingreso}</div>}
+                {mantenimiento.observacion && <div><p className="font-bold">Observación:</p> {mantenimiento.observacion}</div>}
+                {mantenimiento.fecha_ingreso && <div><p className="font-bold">Fecha de ingreso:</p> 
+                  {
+                    new Date(mantenimiento.fecha_ingreso).toLocaleString('es-es', {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                    })
+                  }
+                </div>}
                 <Button className="absolute top-0 right-0 bg-[#d44a80] text-white py-1 px-3 rounded-tr" onClick={() => setSalidaModalVisible(true)}>Dar salida</Button>
               </Card>
             </div>
