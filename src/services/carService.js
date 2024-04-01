@@ -63,3 +63,12 @@ export const createMecanicoService = async (values) => {
     }
 };
 
+export const mecanicoListService = async () => {
+    try {
+        const response = await api.get('mantenimiento/mecanico/');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+

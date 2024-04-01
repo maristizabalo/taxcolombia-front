@@ -1,9 +1,10 @@
 import { HomeOutlined, ToolOutlined, SnippetsOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Image, Layout, Menu, theme } from 'antd';
 import { Link } from 'react-router-dom';
-const { Header, Content, Footer, Sider } = Layout;
 import { useSelector } from 'react-redux';
 import taxcolombiaIMG from '../assets/taxcolombia.png';
+
+const { Header, Content, Footer, Sider } = Layout;
 
 const items = [
   {
@@ -51,47 +52,41 @@ const items = [
       </Link>
     ),
   },
-
-]
+];
 
 const AppLayout = ({ children }) => {
+  const nombreUsuario = useSelector((store) => store.userInfo.user.nombre);
 
-  const username = useSelector((store) => store.userInfo.user.username)
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
-        onBreakpoint={(broken) => {
-          console.log(broken);
-        }}
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
-        }}
         width={200}
         style={{
           height: '100vh',
           position: 'fixed',
         }}
       >
-        <div className="flex items-center justify-center  bg-transparent p-4 mb-4">
-          <Avatar size={64} icon={<UserOutlined />} />
-          <span className="ml-2 text-white">{username}</span>
+        <div className="flex items-center justify-center p-4 mb-4">
+          <Avatar size={64} icon={<UserOutlined />} className='bg-[#42bff2]'/>
+          <span className="ml-2 text-white">{nombreUsuario}</span>
         </div>
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} className='mt-32' />
       </Sider>
       <Layout style={{ marginLeft: 200 }}>
-      <Header
+        <Header
           style={{
-            padding: '60px 50px', // Aumenta el padding para hacer el header más grande
+            padding: '',
             background: colorBgContainer,
           }}
         >
-          <div className="flex items-center justify-center h-full"> {/* Añade mt-4 para bajar la imagen */}
-            <Image src={taxcolombiaIMG} alt="Logo" className="h-12" />{/* Aumenta la altura de la imagen */}
+          <div className="flex items-center justify-center h-full">
+            <Image src={taxcolombiaIMG} alt="Logo" width={200} preview={false}/>
           </div>
         </Header>
         <Content
@@ -102,9 +97,11 @@ const AppLayout = ({ children }) => {
           className='bg-transparent'
         >
           <div
+            className="responsive-content"
             style={{
               paddingLeft: 100,
-              paddingRight:70,
+              paddingRight: 70,
+              paddingBottom: 80,
               minHeight: 'calc(100vh - 114px)',
               borderRadius: borderRadiusLG,
             }}
@@ -126,4 +123,5 @@ const AppLayout = ({ children }) => {
     </Layout>
   );
 };
+
 export default AppLayout;

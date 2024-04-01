@@ -6,9 +6,10 @@ export const EmptyUserState = {
     user: ""
 }
 
-export const persistLocalStorageUser = (username, user_id, rol, auth_tokens) => {
+export const persistLocalStorageUser = (username, user_id, rol, nombre, auth_tokens) => {
     const user = {
         'username': username,
+        'nombre': nombre,
         'user_id': user_id,
         'rol': rol
     }
@@ -40,13 +41,16 @@ export const userSlice = createSlice({
                 action.payload.username,
                 action.payload.user_id,
                 action.payload.rol,
+                action.payload.nombre,
                 action.payload.auth_tokens
             );
             return {
                 user: {
                     username: action.payload.username,
+                    nombre: action.payload.nombre,
                     user_id: action.payload.user_id,
                     rol: action.payload.rol
+
                 },
                 auth_tokens: action.payload.auth_tokens
             }
