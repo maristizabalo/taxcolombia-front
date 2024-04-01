@@ -190,7 +190,6 @@ const TallerPage = () => {
                   {
                     new Date(mantenimiento.fecha_ingreso).toLocaleString('es-es', {
                       weekday: "long",
-                      year: "numeric",
                       month: "long",
                       day: "numeric",
                       hour: 'numeric',
