@@ -1,6 +1,6 @@
 import { Button, Card, Col, DatePicker, Form, Input, Modal, Row, Select, TimePicker, Typography, notification } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { carListService, createMantenimientoService, createMecanicoService, mantenimientoListService, mecanicoListService } from '../services/carService';
+import { carListService, createMantenimientoService, createMecanicoService, editMantenimientoService, mantenimientoListService, mecanicoListService } from '../services/carService';
 import { useEffect, useState } from 'react';
 import { MOTIVO } from "../utils/const";
 import { openNotificationWithIcon } from "../utils/notification";
@@ -16,8 +16,10 @@ const TallerPage = () => {
   const [mecanicoModalVisible, setMecanicoModalVisible] = useState(false)
   const [salidaModalVisible, setSalidaModalVisible] = useState(false)
   const [filteredMantenimientos, setFilteredMantenimientos] = useState([]);
+  const [idSalida, setIdSalida] = useState('')
   const [formEntrada] = Form.useForm();
   const [formMecanico] = Form.useForm();
+  const [formSalida] = Form.useForm();
   const userId = useSelector((store) => store.userInfo.user.user_id)
   console.log(userId)
 
@@ -76,13 +78,10 @@ const TallerPage = () => {
   const handleOkEntrada = async () => {
     try {
       const values = formEntrada.getFieldsValue();
-      const conDay = dayjs(values.fecha_ingreso).subtract(5, 'hours')
       const payload = {
         ...values,
-        fecha_ingreso: conDay,
         registrado_por: userId
       };
-      console.log(conDay)
       await createMantenimientoService(payload);
       openNotificationWithIcon(notification, 'success', 'Entrada a taller registrada exitosamente', '', 4)
       setEntradaModalVisible(false);
@@ -112,27 +111,30 @@ const TallerPage = () => {
       fetchMecanicos();
       formMecanico.resetFields()
     } catch (error) {
+
       console.log(error)
       openNotificationWithIcon(notification, 'error', 'Error al registrar entrada', '', 4)
     }
   };
 
   const handleOkSalida = async () => {
-    // try {
-    //   const values = formMecanico.getFieldsValue();
-    //   const payload = {
-    //     nombre: values.nombre
-    //   };
-    //   console.log(payload)
-    //   await createMecanicoService(payload);
-    //   openNotificationWithIcon(notification, 'success', 'Mecanico registrado de forma exitosa', '', 4)
-    setSalidaModalVisible(false);
-    console.log("Ok salida")
-    //   fetchMantenimientos();
-    // } catch (error) {
-    //   console.log(error)
-    //   openNotificationWithIcon(notification, 'error', 'Error al registrar entrada', '', 4)
-    // }
+    try {
+      const values = formSalida.getFieldsValue();
+      const payload = {
+        realizado_por: values.realizado_por,
+        estado_mantenimiento: 2
+      };
+      console.log(payload)
+      await editMantenimientoService(idSalida, payload);
+      openNotificationWithIcon(notification, 'success', 'Salida de taller registrada correctamente.', '', 4)
+      setSalidaModalVisible(false);
+      fetchMantenimientos();
+      formSalida.resetFields()
+      setIdSalida('')
+    } catch (error) {
+      console.log(error)
+      openNotificationWithIcon(notification, 'error', 'Error al registrar entrada', '', 4)
+    }
   };
 
   const dividirEnGruposDeTres = (mantenimientos) => {
@@ -143,6 +145,17 @@ const TallerPage = () => {
     console.log(grupos)
     return grupos;
   };
+
+  const modalSalida = (record) => {
+    setSalidaModalVisible(true)
+    setIdSalida(record)
+  }
+
+  const handleCancelSalida = () => {
+    setSalidaModalVisible(false)
+    formSalida.resetFields()
+    setIdSalida('')
+  }
 
   return (
     <div>
@@ -186,7 +199,7 @@ const TallerPage = () => {
                 }}
               >
                 {mantenimiento.observacion && <div><p className="font-bold">Observación:</p> {mantenimiento.observacion}</div>}
-                {mantenimiento.fecha_ingreso && <div><p className="font-bold">Fecha de ingreso:</p> 
+                {mantenimiento.fecha_ingreso && <div><p className="font-bold">Fecha de ingreso:</p>
                   {
                     new Date(mantenimiento.fecha_ingreso).toLocaleString('es-es', {
                       weekday: "long",
@@ -198,7 +211,7 @@ const TallerPage = () => {
                     })
                   }
                 </div>}
-                <Button className="absolute top-0 right-0 bg-[#d44a80] text-white py-1 px-3 rounded-tr" onClick={() => setSalidaModalVisible(true)}>Dar salida</Button>
+                <Button className="absolute top-0 right-0 bg-[#d44a80] text-white py-1 px-3 rounded-tr" onClick={() => modalSalida(mantenimiento.id)}>Dar salida</Button>
               </Card>
             </div>
           ))}
@@ -248,19 +261,19 @@ const TallerPage = () => {
             </Col>
             <Col span={12}>
               <Form.Item name="observacion" label="Observación">
-                <Input.TextArea rows={8}/>
+                <Input.TextArea rows={8} />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Modal>
       <Modal
-        title="Agregar entrada al taller"
+        title="Agregar mecanico"
         open={mecanicoModalVisible}
         onOk={handleOkMecanico}
         onCancel={() => setMecanicoModalVisible(false)}
       >
-        <Form form={formMecanico}>
+        <Form form={formMecanico} layout="vertical">
           <Form.Item name="nombre" label="Nombre mecanico">
             <Input />
           </Form.Item>
@@ -270,10 +283,10 @@ const TallerPage = () => {
         title="Dar salida de taller"
         open={salidaModalVisible}
         onOk={handleOkSalida}
-        onCancel={() => setSalidaModalVisible(false)}
+        onCancel={handleCancelSalida}
 
       >
-        <Form form={formMecanico}>
+        <Form form={formSalida} layout="vertical">
           <Form.Item name="realizado_por" label="Mecanico">
             <Select
               showSearch
@@ -288,11 +301,8 @@ const TallerPage = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="fecha_salida" label="Fecha de salida">
-            <DatePicker />
-          </Form.Item>
-          <Form.Item name="hora_salida" label="Hora de salida">
-            <TimePicker use12Hours format="h:mm A" minuteStep={30} hourStep={1} />
+          <Form.Item name="fecha_salida" label="Hora de salida">
+            <TimePicker use12Hours minuteStep={15} format='hh:mm A' changeOnScroll needConfirm={false} />
           </Form.Item>
         </Form>
       </Modal>

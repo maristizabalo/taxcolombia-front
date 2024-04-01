@@ -47,7 +47,7 @@ export const createMantenimientoService = async (values) => {
 
 export const editMantenimientoService = async (id, values) => {
     try {
-        const response = await api.put(`mantenimiento/${id}/`, values)
+        const response = await api.patch(`mantenimiento/${id}/`, values)
         return response.data;
     } catch (error) {
         console.log(error)
