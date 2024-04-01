@@ -21,8 +21,6 @@ const TallerPage = () => {
   const [formMecanico] = Form.useForm();
   const [formSalida] = Form.useForm();
   const userId = useSelector((store) => store.userInfo.user.user_id)
-  console.log(userId)
-
 
   useEffect(() => {
     fetchMantenimientos();
@@ -35,7 +33,6 @@ const TallerPage = () => {
       const data = await mantenimientoListService();
       setMantenimientos(data);
       setFilteredMantenimientos(data);
-      console.log(data)
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -45,7 +42,6 @@ const TallerPage = () => {
     try {
       const data = await mecanicoListService();
       setMecanicos(data);
-      console.log(data)
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -53,7 +49,6 @@ const TallerPage = () => {
 
   // Filtra los mantenimientos según la placa seleccionada
   const handlePlacaChange = (value) => {
-    console.log(value)
     if (value === "") {
       // Si el valor está vacío, muestra todos los mantenimientos
       setFilteredMantenimientos(mantenimientos);
