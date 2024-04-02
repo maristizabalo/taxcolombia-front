@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, Modal, Row, Select, TimePicker, Typography, notification } from "antd"
+import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, TimePicker, Typography, notification } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { carListService, } from '../services/carService';
 import { useEffect, useState } from 'react';
@@ -29,6 +29,30 @@ const NotasPage = () => {
       console.error('Error fetching componentes', error);
     }
   };
+
+  const columns = [
+    {
+      title: 'Vehiculo',
+      dataIndex: 'vehiculo_placa',
+      key: 'placa',
+      width: '10%',
+    },
+    {
+      title: 'Nota',
+      dataIndex: 'nota',
+      key: 'nota',
+      width: '80%',
+      ellipsis: true,
+      style: { textWrap: 'word-break' },
+    },
+    {
+      title: 'Autor',
+      dataIndex: 'autor_nombre',
+      key: 'autor',
+      width: '10%',
+    }
+  ]
+
 
 
   // Filtra los notas según la placa seleccionada
@@ -96,7 +120,7 @@ const NotasPage = () => {
       </div>
 
 
-      <div className="flex flex-wrap">
+      {/* <div className="flex flex-wrap">
         {filteredNotas
           .sort((a, b) => b.id - a.id) // Ordenar los elementos de manera descendente por el ID
           .map((nota, innerIndex) => (
@@ -107,11 +131,11 @@ const NotasPage = () => {
                 title={(<div>{nota.vehiculo_placa}</div>)}
               >
                 {nota.nota &&
-                  <div style={{ fontSize: "14px", lineHeight: "1.5", width: "100%" }}> {/* Establece el ancho del texto al 100% para evitar el desplazamiento horizontal */}
+                  <div style={{ fontSize: "14px", lineHeight: "1.5", width: "100%" }}>
                     <p className="font-bold">Nota:</p> {nota.nota}
                   </div>
                 }
-                {nota.registrado_por && <div><p className="font-bold">Autor:</p> {nota.registrado_por}</div>}
+                {nota.registrado_por && <div><p className="font-bold">Autor:</p> {nota.autor_nombre}</div>}
                 {nota.hora_registro && <div><p className="font-bold">Fecha:</p>
                   {
                     new Date(nota.hora_registro).toLocaleString('es-es', {
@@ -127,8 +151,9 @@ const NotasPage = () => {
               </Card>
             </div>
           ))}
-      </div>
+      </div> */}
 
+      <Table id="miInventarioTable" columns={columns} dataSource={notas} size='small' />
 
 
       <Modal
