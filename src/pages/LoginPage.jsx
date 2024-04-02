@@ -1,7 +1,7 @@
 import { Form, Input, Button, Image, notification } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { login } from '../services/authServices';
 import { jwtDecode } from 'jwt-decode';
 import { createUser } from '../redux/states/user';
@@ -15,6 +15,7 @@ const Login = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const session = queryParams.get('session');
+  const [login, setLogin] = useState(false)
 
   useEffect(() => {
     if (session === 'expired') {
@@ -44,28 +45,31 @@ const Login = () => {
           className="w-80"
           initialValues={{ remember: true }}
           onFinish={onFinish}
+          layout='vertical'
         >
           <Form.Item
             name="username"
             type="text"
             className="form-item"
+            label="Nombre de usuario"
             rules={[{ required: true, message: 'Por favor ingrese su nombre de usuario!' }]}
           >
-            <Input placeholder="Nombre de usuario" />
+            <Input placeholder='username'/>
           </Form.Item>
 
           <Form.Item
             name="password"
+            label="Contraseña"
             rules={[{ required: true, message: 'Por favor ingrese su contraseña!' }]}
           >
-            <Input.Password placeholder="Contraseña" />
+            <Input.Password placeholder='***'/>
           </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full">
+            <Button type="default" htmlType="submit" className="w-full bg-[#f7ec4e]">
               Iniciar sesión
             </Button>
-          </Form.Item>
+            <Button type="primary" htmlType="submit" className="w-full  mt-3">
+              Registrarme
+            </Button>
         </Form>
       </div>
     </div>
