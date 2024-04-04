@@ -27,9 +27,18 @@ export const editCarService = async (id, values) => {
     }
 };
 
-export const mantenimientoListService = async () => {
+export const mantenimientoActiveListService = async () => {
     try {
         const response = await api.get('mantenimiento/');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const mantenimientoListService = async () => {
+    try {
+        const response = await api.get('mantenimiento/all');
         return response.data;
     } catch (error) {
         console.log(error)

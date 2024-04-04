@@ -1,8 +1,8 @@
-import { Button, Card, Col, Form, Input, Modal, Row, Select, TimePicker, notification } from "antd"
+import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, TimePicker, notification } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { carListService, createMantenimientoService, createMecanicoService, editMantenimientoService, mantenimientoListService, mecanicoListService } from '../services/carService';
+import { carListService, createMantenimientoService, createMecanicoService, editMantenimientoService, mantenimientoActiveListService, mantenimientoListService, mecanicoListService } from '../services/carService';
 import { useEffect, useState } from 'react';
-import { MOTIVO } from "../utils/const";
+import { ESTADO_MANTENIMIENTO, MOTIVO } from "../utils/const";
 import { CloseCircleOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { openNotificationWithIcon } from "../utils/notification";
 import { useSelector } from "react-redux";
@@ -11,10 +11,12 @@ import moment from "moment";
 const TallerPage = () => {
   const [mantenimientos, setMantenimientos] = useState([])
   const [cars, setCars] = useState([])
+  const [tallerActual, setTallerActual] = useState(true);
   const [mecanicos, setMecanicos] = useState([])
   const [entradaModalVisible, setEntradaModalVisible] = useState(false)
   const [mecanicoModalVisible, setMecanicoModalVisible] = useState(false)
   const [salidaModalVisible, setSalidaModalVisible] = useState(false)
+  const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false);
   const [filteredMantenimientos, setFilteredMantenimientos] = useState([]);
   const [idSalida, setIdSalida] = useState('')
   const [editingMantenimiento, setEditingMantenimiento] = useState(null);
@@ -23,17 +25,90 @@ const TallerPage = () => {
   const [formSalida] = Form.useForm();
   const userId = useSelector((store) => store.userInfo.user.user_id)
 
+  const columns = [
+    {
+      title: 'Placa',
+      dataIndex: 'vehiculo_placa',
+      key: 'placa',
+      width: '5%',
+    },
+    {
+      title: 'Movil',
+      dataIndex: 'vehiculo_movil',
+      key: 'movil',
+      width: '5%',
+    },
+    {
+      title: 'Motivo',
+      dataIndex: 'motivo_nombre',
+      key: 'motivo',
+      width: '5%',
+    },
+    {
+      title: 'Observacion',
+      dataIndex: 'observacion',
+      key: 'observacion',
+      width: '15%',
+    },
+    {
+      title: 'Ingreso',
+      dataIndex: 'fecha_ingreso',
+      key: 'fecha_ingreso',
+      width: '4%',
+      render: fecha_ingreso => moment(fecha_ingreso).format('YYYY-MM-DD h:mm A')
+    },
+    {
+      title: 'Salida',
+      dataIndex: 'fecha_salida',
+      key: 'fecha_salida',
+      width: '4%',
+      render: fecha_salida => moment(fecha_salida).format('YYYY-MM-DD h:mm A')
+    },
+    {
+      title: 'Registrado',
+      dataIndex: 'hora_registro',
+      key: 'hora_registro',
+      width: '4%',
+      render: hora_registro => moment(hora_registro).format('YYYY-MM-DD h:mm A')
+    },
+    {
+      title: 'Autor',
+      dataIndex: 'autor_nombre',
+      key: 'autor',
+      width: '10%',
+    },
+    {
+      title: 'Estado',
+      dataIndex: 'estado_mantenimiento',
+      key: 'estado',
+      width: '5%',
+      render: estado => ESTADO_MANTENIMIENTO[estado]
+    }
+  ]
   useEffect(() => {
-    fetchMantenimientos();
-    fetchCars();
-    fetchMecanicos();
-  }, []);
+    if (tallerActual) {
+      fetchMantenimientosActivos();
+      fetchCars();
+      fetchMecanicos();
+    } else {
+      fetchMantenimientos();
+    }
+  }, [tallerActual]);
+
+  const fetchMantenimientosActivos = async () => {
+    try {
+      const data = await mantenimientoActiveListService();
+      setMantenimientos(data);
+      setFilteredMantenimientos(data);
+    } catch (error) {
+      console.error('Error fetching componentes', error);
+    }
+  };
 
   const fetchMantenimientos = async () => {
     try {
       const data = await mantenimientoListService();
       setMantenimientos(data);
-      setFilteredMantenimientos(data);
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -102,7 +177,7 @@ const TallerPage = () => {
 
       // Se cierra el modal y se actualiza la lista de mantenimientos
       setEntradaModalVisible(false);
-      fetchMantenimientos();
+      fetchMantenimientosActivos();
       formEntrada.resetFields();
       setEditingMantenimiento(null); // Limpiar el mantenimiento en edición
     } catch (error) {
@@ -140,6 +215,7 @@ const TallerPage = () => {
     try {
       const values = formSalida.getFieldsValue();
       const payload = {
+        ...values,
         realizado_por: values.realizado_por,
         estado_mantenimiento: 2
       };
@@ -147,7 +223,7 @@ const TallerPage = () => {
       await editMantenimientoService(idSalida, payload);
       openNotificationWithIcon(notification, 'success', 'Salida de taller registrada correctamente.', '', 4)
       setSalidaModalVisible(false);
-      fetchMantenimientos();
+      fetchMantenimientosActivos();
       formSalida.resetFields()
       setIdSalida('')
     } catch (error) {
@@ -161,81 +237,134 @@ const TallerPage = () => {
     setIdSalida(record)
   }
 
+  const modalEliminar = (record) => {
+    setConfirmDeleteModalVisible(true)
+    setIdSalida(record)
+  }
+
   const handleCancelSalida = () => {
     setSalidaModalVisible(false)
     formSalida.resetFields()
     setIdSalida('')
   }
 
+  const handleDeleteConfirm = async () => {
+    try {
+      // Ejecuta el servicio editMantenimientoService con estado_mantenimiento = 3
+      await editMantenimientoService(idSalida, { estado_mantenimiento: 3 });
+      openNotificationWithIcon(notification, 'success', 'Entrada al taller cancelada exitosamente', '', 4);
+      setConfirmDeleteModalVisible(false);
+      fetchMantenimientosActivos(); // Actualiza la lista de mantenimientos
+      setIdSalida('')
+    } catch (error) {
+      console.error('Error al cancelar la entrada al taller', error);
+      openNotificationWithIcon(notification, 'error', 'Error al cancelar la entrada al taller', '', 4);
+    }
+  };
+
   return (
-    <div>
-      <div className="title flex items-center py-4">
-        <Input
-          placeholder="Buscar placa en taller..."
-          allowClear
-          width={200}
-          onChange={(e) => handlePlacaChange(e.target.value)}
-          size="large"
-        />
+    <div className="container">
+      <div className="flex justify-around">
         <Button
           size="large"
           shape="round"
-          className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
-          onClick={() => setEntradaModalVisible(true)}>
-          <PlusCircleOutlined className="mr-2" />
-          Agregar entrada
+          className={`w-full btn ${tallerActual ? 'text-white' : 'text-[#42BFF2]'} px-4 py-2 items-center ${tallerActual ? 'bg-[#d44a80]' : 'bg-white'}`}
+          onClick={() => setTallerActual(true)}
+        >
+          TALLER ACTUAL
         </Button>
         <Button
           size="large"
           shape="round"
-          className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
-          onClick={() => setMecanicoModalVisible(true)}>
-          <PlusCircleOutlined className="mr-2" />
-          Agregar mecanico
+          className={`w-full btn ${tallerActual ? 'text-[#42BFF2]' : 'text-white'} px-4 py-2 items-center ml-4 ${!tallerActual ? 'bg-[#d44a80]' : 'bg-white'}`}
+          onClick={() => setTallerActual(false)}
+        >
+          TALLER HISTÓRICO
         </Button>
       </div>
-
-
-      <div className="flex flex-wrap">
-        {filteredMantenimientos
-          .sort((a, b) => b.id - a.id) // Ordenar los elementos de manera descendente por el ID
-          .map((mantenimiento) => (
-            <div key={mantenimiento.id} className="w-1/3 px-4 mb-4">
-              <Card
-                className="hover:border-l-{fuchsia-700}"
-                title={(<div>{mantenimiento.vehiculo_placa} - {MOTIVO[mantenimiento.motivo]}</div>)}
-                style={{
-                  backgroundColor: mantenimiento.motivo === 1 ? '#FFF7E6' : mantenimiento.motivo === 2 ? '#FFE6E6' : '',
-                }}
-                actions={[
-                  <span key="editar" className="text-[#f7ec4e] hover:bg-gray-100" onClick={() => openEditModal(mantenimiento)}>
-                    <EditOutlined className="text-lg mr-1" /> Editar
-                  </span>,
-                  <span key="salida" className="text-[#42bff2] hover:bg-gray-100" onClick={() => modalSalida(mantenimiento.id)}>
-                    <CheckCircleOutlined className="text-lg mr-1" /> Salida
-                  </span>,
-                  <span key="eliminar" className="text-[#d44a80] hover:bg-gray-100">
-                    <CloseCircleOutlined className="text-lg mr-1" /> Eliminar
-                  </span>,
-                ]}
-              >
-                {mantenimiento.observacion && <div><p className="font-bold">Observación:</p> {mantenimiento.observacion}</div>}
-                {mantenimiento.fecha_ingreso && <div><p className="font-bold">Fecha de ingreso:</p>
-                  {
-                    new Date(mantenimiento.fecha_ingreso).toLocaleString('es-es', {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true
-                    })
-                  }
-                </div>}
-              </Card>
+      <div className="content-container mt-4 p-6">
+        {tallerActual ?
+          <div>
+            <div className="flex py-4">
+              <Input
+                placeholder="Buscar placa en taller..."
+                allowClear
+                onChange={(e) => handlePlacaChange(e.target.value)}
+                size="large"
+              />
+              <Button
+                size="large"
+                shape="round"
+                className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
+                onClick={() => setEntradaModalVisible(true)}>
+                <PlusCircleOutlined className="mr-2" />
+                Agregar entrada
+              </Button>
+              <Button
+                size="large"
+                shape="round"
+                className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
+                onClick={() => setMecanicoModalVisible(true)}>
+                <PlusCircleOutlined className="mr-2" />
+                Agregar mecanico
+              </Button>
             </div>
-          ))}
+
+
+            <div className="flex flex-wrap">
+              {filteredMantenimientos
+                .sort((a, b) => b.id - a.id) // Ordenar los elementos de manera descendente por el ID
+                .map((mantenimiento) => (
+                  <div key={mantenimiento.id} className="w-1/3 mb-4 px-7">
+                    <Card
+                      className="hover:border-l-{fuchsia-700}"
+                      title={(<>
+                        <div>
+                          {mantenimiento.vehiculo_placa} - {mantenimiento.vehiculo_movil}
+                        </div>
+                        <div>
+                          {MOTIVO[mantenimiento.motivo]}
+                        </div>
+                      </>)}
+                      style={{
+                        backgroundColor: mantenimiento.motivo === 1 ? '#FFF7E6' : mantenimiento.motivo === 2 ? '#FFE6E6' : '',
+                      }}
+                      actions={[
+                        <span key="editar" className="text-[#000000] font-bold hover:bg-gray-100" onClick={() => openEditModal(mantenimiento)}>
+                          <EditOutlined className="text-lg mr-1" /> Editar
+                        </span>,
+                        <span key="salida" className="text-[#42bff2] font-bold hover:bg-gray-100" onClick={() => modalSalida(mantenimiento.id)}>
+                          <CheckCircleOutlined className="text-lg mr-1" /> Salida
+                        </span>,
+                        <span key="eliminar" className="text-[#d44a80] font-bold hover:bg-gray-100" onClick={() => modalEliminar(mantenimiento.id)}>
+                          <CloseCircleOutlined className="text-lg mr-1" /> Eliminar
+                        </span>,
+                      ]}
+                    >
+                      {mantenimiento.observacion && <div><p className="font-bold">Observación:</p> {mantenimiento.observacion}</div>}
+                      {mantenimiento.fecha_ingreso && <div><p className="font-bold">Fecha de ingreso:</p>
+                        {
+                          new Date(mantenimiento.fecha_ingreso).toLocaleString('es-es', {
+                            weekday: "long",
+                            month: "long",
+                            day: "numeric",
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true
+                          })
+                        }
+                      </div>}
+                    </Card>
+                  </div>
+
+                ))}
+            </div>
+          </div>
+          :
+          <Table id="miInventarioTable" columns={columns} dataSource={mantenimientos} size='small' />
+        }
       </div>
+
 
 
 
@@ -328,6 +457,15 @@ const TallerPage = () => {
             <Input.TextArea rows={8} />
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Confirmar eliminación"
+        open={confirmDeleteModalVisible}
+        onOk={handleDeleteConfirm}
+        onCancel={() => setConfirmDeleteModalVisible(false)}
+      >
+        <p>¿Estás seguro que quieres cancelar este ingreso al taller?</p>
       </Modal>
 
     </div>

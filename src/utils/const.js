@@ -11,3 +11,9 @@ export const MOTIVO = {
     3: 'QR1',
     4: 'PERMISO'
 };
+
+export const ESTADO_MANTENIMIENTO = {
+    1: 'EN PROCESO',
+    2: 'TERMINADO',
+    3: 'CANCELADO'
+};
