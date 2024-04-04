@@ -15,7 +15,7 @@ const Login = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const session = queryParams.get('session');
-  const [login, setLogin] = useState(false)
+  const [loginMode, setLoginMode] = useState(false)
 
   useEffect(() => {
     if (session === 'expired') {

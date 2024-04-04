@@ -42,7 +42,6 @@ const NotasPage = () => {
       dataIndex: 'nota',
       key: 'nota',
       width: '80%',
-      ellipsis: true,
       style: { textWrap: 'word-break' },
     },
     {
@@ -119,45 +118,11 @@ const NotasPage = () => {
         </Button>
       </div>
 
-
-      {/* <div className="flex flex-wrap">
-        {filteredNotas
-          .sort((a, b) => b.id - a.id) // Ordenar los elementos de manera descendente por el ID
-          .map((nota, innerIndex) => (
-            <div key={nota.id} className="w-1/3 px-4 mb-4">
-              <Card
-                className="hover:border-l-{fuchsia-700} overflow-hidden" // Cambia overflow-auto a overflow-hidden para evitar el desplazamiento horizontal
-                style={{ maxHeight: "300px" }}
-                title={(<div>{nota.vehiculo_placa}</div>)}
-              >
-                {nota.nota &&
-                  <div style={{ fontSize: "14px", lineHeight: "1.5", width: "100%" }}>
-                    <p className="font-bold">Nota:</p> {nota.nota}
-                  </div>
-                }
-                {nota.registrado_por && <div><p className="font-bold">Autor:</p> {nota.autor_nombre}</div>}
-                {nota.hora_registro && <div><p className="font-bold">Fecha:</p>
-                  {
-                    new Date(nota.hora_registro).toLocaleString('es-es', {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true
-                    })
-                  }
-                </div>}
-              </Card>
-            </div>
-          ))}
-      </div> */}
-
       <Table id="miInventarioTable" columns={columns} dataSource={notas} size='small' />
 
 
       <Modal
-        title={(<div className="text-2xl">Agregar entrada a taller</div>)}
+        title={(<div className="text-2xl">Agregar Nota</div>)}
         open={notaModalVisible}
         onOk={handleOkNota}
         onCancel={handleCancelNota}
