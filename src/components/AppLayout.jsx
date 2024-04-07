@@ -1,8 +1,9 @@
-import { HomeOutlined, ToolOutlined, SnippetsOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
+import { HomeOutlined, ToolOutlined, SnippetsOutlined, FormOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Avatar, Image, Layout, Menu, theme } from 'antd';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import taxcolombiaIMG from '../assets/taxcolombia.png';
+import Logout from './Logout';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -52,6 +53,10 @@ const items = [
       </Link>
     ),
   },
+  {
+    label: (<Logout />),
+    key: 'salir',
+  },
 ];
 
 const AppLayout = ({ children }) => {
@@ -73,7 +78,7 @@ const AppLayout = ({ children }) => {
         }}
       >
         <div className="flex items-center justify-center p-4 mb-4">
-          <Avatar size={64} icon={<UserOutlined />} className='bg-[#42bff2]'/>
+          <Avatar size={64} icon={<UserOutlined />} className='bg-[#42bff2]' />
           <span className="ml-2 text-white">{nombreUsuario}</span>
         </div>
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} className='mt-32' />
@@ -86,7 +91,7 @@ const AppLayout = ({ children }) => {
           }}
         >
           <div className="flex items-center justify-center h-full">
-            <Image src={taxcolombiaIMG} alt="Logo" width={200} preview={false}/>
+            <Image src={taxcolombiaIMG} alt="Logo" width={200} preview={false} />
           </div>
         </Header>
         <Content

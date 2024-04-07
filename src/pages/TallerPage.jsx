@@ -250,7 +250,6 @@ const TallerPage = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      // Ejecuta el servicio editMantenimientoService con estado_mantenimiento = 3
       await editMantenimientoService(idSalida, { estado_mantenimiento: 3 });
       openNotificationWithIcon(notification, 'success', 'Entrada al taller cancelada exitosamente', '', 4);
       setConfirmDeleteModalVisible(false);
@@ -361,7 +360,7 @@ const TallerPage = () => {
             </div>
           </div>
           :
-          <Table id="miInventarioTable" columns={columns} dataSource={mantenimientos} size='small' />
+          <Table columns={columns} dataSource={mantenimientos} size='small' />
         }
       </div>
 

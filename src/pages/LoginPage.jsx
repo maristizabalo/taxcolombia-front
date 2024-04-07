@@ -10,12 +10,17 @@ import taxcolombiaIMG from '../assets/taxcolombia.png';
 
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const session = queryParams.get('session');
-  const formLogin = Form.useForm()
-  const formRegister = Form.useForm()
+  const [formRegisterData, setFormRegisterData] = useState({
+    username: '',
+    password: '',
+    nombre: ''
+  });
+  const [formLogin] = Form.useForm()
+  const [formRegister] = Form.useForm()
   const [loginMode, setLoginMode] = useState(true)
 
   useEffect(() => {
@@ -32,7 +37,7 @@ const Login = () => {
       user['auth_tokens'] = result;
       dispatch(createUser(user));
       openNotificationWithIcon(notification, 'success', 'Inicio de sesión exitoso', '', 4);
-      setLoginMode(false)
+      navigate('/private')
     } catch (error) {
       openNotificationWithIcon(notification, 'error', 'Verifica tu usuario y clave, si el error continúa contacta con el administrador.', '', 4);
     }
@@ -40,8 +45,7 @@ const Login = () => {
 
   const onFinishRegister = async () => {
     try {
-      const values = formRegister.getFieldsValue();
-      await register(values);
+      await register(formRegisterData);
       openNotificationWithIcon(notification, 'success', 'Registrado exitosamente', '', 4);
       setLoginMode(true)
     } catch (error) {
@@ -52,6 +56,14 @@ const Login = () => {
   const handleLoginMode = () => {
     setLoginMode(!loginMode)
   }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormRegisterData({
+      ...formRegisterData,
+      [name]: value
+    });
+  };
 
   return (
     <div className="flex justify-center items-center h-screen bg-opacity-50 bg-black">
@@ -66,8 +78,7 @@ const Login = () => {
                 form={formLogin}
               >
                 <Form.Item
-                  name="username"
-                  type="text"
+                  name='username'
                   className="form-item"
                   label="Nombre de usuario"
                   rules={[{ required: true, message: 'Por favor ingrese su nombre de usuario!' }]}
@@ -76,7 +87,7 @@ const Login = () => {
                 </Form.Item>
 
                 <Form.Item
-                  name="password"
+                  name='password'
                   label="Contraseña"
                   rules={[{ required: true, message: 'Por favor ingrese su contraseña!' }]}
                 >
@@ -95,25 +106,22 @@ const Login = () => {
               <Form
                 className="w-80"
                 layout='vertical'
-                form={formRegister}
               >
                 <Form.Item
                   name="username"
-                  type="text"
                   className="form-item"
                   label="Nombre de usuario"
                   rules={[{ required: true, message: 'Por favor ingrese su nombre de usuario!' }]}
                 >
-                  <Input placeholder='username' />
+                  <Input placeholder='username' name="username" onChange={handleChange} />
                 </Form.Item>
 
                 <Form.Item
                   name="password"
                   label="Contraseña"
-                  className="form-item"
                   rules={[{ required: true, message: 'Por favor ingrese su contraseña!' }]}
                 >
-                  <Input.Password placeholder='***' />
+                  <Input.Password placeholder='***' name="password" onChange={handleChange} />
                 </Form.Item>
 
                 <Form.Item
@@ -122,14 +130,14 @@ const Login = () => {
                   label="Nombre completo"
                   rules={[{ required: true, message: 'Por favor ingrese su nombre y apellido' }]}
                 >
-                  <Input placeholder='Pepito Perez' />
+                  <Input placeholder='Pepito Perez' name="nombre" onChange={handleChange} />
                 </Form.Item>
               </Form>
               <Button type="primary" onClick={onFinishRegister} className="w-full">
                 Registrarme
               </Button>
               <Button type="link" onClick={handleLoginMode} className="w-full  mt-3">
-                Iniciar <Sesion-></Sesion->
+                Iniciar Sesion
               </Button>
             </>
         }
