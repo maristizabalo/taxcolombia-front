@@ -34,7 +34,6 @@ const Private = () => {
     return (
         <AppLayout>
             <Routes>
-                <Route path="/" element={<HomePage />} />
                 <Route path="/taller" element={<TallerPage />} />
                 <Route path="/notas" element={<NotasPage />} />
                 <Route path="/informe" element={<InformePage />} />

@@ -1,8 +1,17 @@
 import {api} from "../utils/api";
 
-export const notaListService = async () => {
+export const notaActiveListService = async () => {
     try {
         const response = await api.get('nota/');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const notaListService = async () => {
+    try {
+        const response = await api.get('nota/all');
         return response.data;
     } catch (error) {
         console.log(error)
@@ -20,7 +29,7 @@ export const createNotaService = async (values) => {
 
 export const editNotaService = async (id, values) => {
     try {
-        const response = await api.put(`nota/${id}/`, values)
+        const response = await api.patch(`nota/${id}/`, values)
         return response.data;
     } catch (error) {
         console.log(error)

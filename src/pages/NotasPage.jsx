@@ -1,40 +1,73 @@
-import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, TimePicker, Typography, notification } from "antd"
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Col, Form, Input, Modal, Row, Select, Table, notification } from "antd"
+import { PlusCircleOutlined, EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { carListService, } from '../services/carService';
 import { useEffect, useState } from 'react';
 import { openNotificationWithIcon } from "../utils/notification";
 import { useSelector } from "react-redux";
-import { createNotaService, notaListService } from "../services/notaService";
+import { createNotaService, editNotaService, notaActiveListService, notaListService } from "../services/notaService";
+import moment from "moment";
 
 const NotasPage = () => {
+  const [notasActive, setNotasActive] = useState([])
   const [notas, setNotas] = useState([])
   const [cars, setCars] = useState([])
+  const [notasActual, setNotasActual] = useState(true);
   const [notaModalVisible, setNotaModalVisible] = useState(false)
-  const [filteredNotas, setFilteredNotas] = useState([]);
+  const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false)
+  const [editingNota, setEditingNota] = useState(null);
   const [idNota, setIdNota] = useState('')
   const [formNota] = Form.useForm();
   const userId = useSelector((store) => store.userInfo.user.user_id)
 
   useEffect(() => {
-    fetchNotas();
-    fetchCars();
+    if (notasActual) {
+      fetchNotasActive();
+      fetchCars();
+    } else {
+      fetchNotas();
+    }
+  }, [notasActual]);
+  useEffect(() => {
+
   }, []);
 
-  const fetchNotas = async () => {
+  const openEditModal = (nota) => {
+    setEditingNota(nota);
+    setNotaModalVisible(true)
+    formNota.setFieldValue("vehiculo", nota.vehiculo)
+    formNota.setFieldValue("nota", nota.nota)
+  };
+
+  const fetchNotasActive = async () => {
     try {
-      const data = await notaListService();
-      setNotas(data);
-      setFilteredNotas(data);
+      const data = await notaActiveListService();
+      setNotasActive(data);
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
   };
 
+  const fetchNotas = async () => {
+    try {
+      const data = await notaListService();
+      setNotas(data);
+    } catch (error) {
+      console.error('Error fetching componentes', error);
+    }
+  };
+
+
   const columns = [
     {
-      title: 'Vehiculo',
+      title: 'Placa',
       dataIndex: 'vehiculo_placa',
       key: 'placa',
+      width: '10%',
+    },
+    {
+      title: 'Movil',
+      dataIndex: 'vehiculo_movil',
+      key: 'movil',
       width: '10%',
     },
     {
@@ -49,28 +82,80 @@ const NotasPage = () => {
       dataIndex: 'autor_nombre',
       key: 'autor',
       width: '10%',
-    }
+    },
+    {
+      title: 'Acciones',
+      key: 'acciones',
+      render: (text, record) => {
+        // Verifica si la nota fue registrada por el usuario actual
+        const esRegistradoPorUsuarioActual = record.registrado_por === userId;
+
+        // Si es registrado por el usuario actual, muestra los botones de editar y eliminar
+        if (esRegistradoPorUsuarioActual) {
+          return (
+            <>
+              <span key="editar" className="text-[#000000] font-bold hover:bg-gray-100" onClick={() => openEditModal(record)}>
+                <EditOutlined className="text-lg mr-4" />
+              </span>
+              <span key="eliminar" className="text-[#d44a80] font-bold hover:bg-gray-100" onClick={() => modalEliminar(record.id)}>
+                <CloseCircleOutlined className="text-lg mr-1" />
+              </span>
+            </>
+          );
+        }
+
+        // Si no es registrado por el usuario actual, no muestra ningún botón
+        return null;
+      },
+    },
   ]
 
-
-
-  // Filtra los notas según la placa seleccionada
-  const handlePlacaChange = (value) => {
-    if (value === "") {
-      // Si el valor está vacío, muestra todos los notas
-      setFilteredNotas(notas);
-    } else {
-      // Si hay un valor de placa, filtra los notas por esa placa
-      const filtered = notas.filter(nota => nota.vehiculo_placa.toLowerCase().includes(value.toLowerCase()));
-      setFilteredNotas(filtered);
-    }
-  };
+  const columnsAll = [
+    {
+      title: 'Placa',
+      dataIndex: 'vehiculo_placa',
+      key: 'placa',
+      width: '5%',
+    },
+    {
+      title: 'Movil',
+      dataIndex: 'vehiculo_movil',
+      key: 'movil',
+      width: '5%',
+    },
+    {
+      title: 'Nota',
+      dataIndex: 'nota',
+      key: 'nota',
+      width: '60%',
+      style: { textWrap: 'word-break' },
+    },
+    {
+      title: 'Autor',
+      dataIndex: 'autor_nombre',
+      key: 'autor',
+      width: '10%',
+    },
+    {
+      title: 'Fecha de registro',
+      dataIndex: 'hora_registro',
+      key: 'hora',
+      width: '10%',
+      render: hora_registro => moment(hora_registro).format('YYYY-MM-DD h:mm A')
+    },
+    {
+      title: 'Estado',
+      dataIndex: 'is_active',
+      key: 'active',
+      width: '10%',
+      render: is_active => is_active ? 'REGISTRADO' : 'CANCELADO'
+    },
+  ]
 
   const fetchCars = async () => {
     try {
       const data = await carListService();
       setCars(data);
-
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -83,13 +168,25 @@ const NotasPage = () => {
         ...values,
         registrado_por: userId
       };
-      await createNotaService(payload);
-      openNotificationWithIcon(notification, 'success', 'Nota agregada correctamente', '', 4)
-      setNotaModalVisible(false);
-      fetchNotas();
-      formNota.resetFields()
+
+      if (editingNota) {
+        await editNotaService(editingNota.id, payload);
+        openNotificationWithIcon(notification, 'success', 'Nota actualizada exitosamente', '', 4);
+        setNotaModalVisible(false);
+        fetchNotasActive();
+        formNota.resetFields()
+      } else {
+        await createNotaService(payload);
+        openNotificationWithIcon(notification, 'success', 'Nota agregada correctamente', '', 4)
+        setNotaModalVisible(false);
+        fetchNotasActive();
+        formNota.resetFields()
+      }
+
+      setEditingNota(null); // Limpiar el mantenimiento en edición
     } catch (error) {
-      openNotificationWithIcon(notification, 'error', 'Error al agregar nota', '', 4)
+      console.log(error);
+      openNotificationWithIcon(notification, 'error', 'Error al registrar nota', '', 4);
     }
   };
 
@@ -98,31 +195,68 @@ const NotasPage = () => {
     formNota.resetFields()
   }
 
+  const modalEliminar = (record) => {
+    setConfirmDeleteModalVisible(true)
+    setIdNota(record)
+  }
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await editNotaService(idNota, { is_active: false });
+      openNotificationWithIcon(notification, 'success', 'Nota cancelada exitosamente', '', 4);
+      setConfirmDeleteModalVisible(false);
+      fetchNotasActive();
+      setIdNota('')
+    } catch (error) {
+      console.error('Error al cancelar la entrada al taller', error);
+      openNotificationWithIcon(notification, 'error', 'Error al cancelar la nota', '', 4);
+    }
+  };
+
   return (
-    <div>
-      <div className="title flex items-center py-4">
-        <Input
-          placeholder="Buscar placa en notas..."
-          allowClear
-          width={200}
-          onChange={(e) => handlePlacaChange(e.target.value)}
-          size="large"
-        />
+    <div className="container">
+      <div className="flex justify-around">
         <Button
           size="large"
           shape="round"
-          className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
-          onClick={() => setNotaModalVisible(true)}>
-          <PlusCircleOutlined className="mr-2" />
-          Agregar Nota
+          className={`w-full btn ${notasActual ? 'text-white' : 'text-[#42BFF2]'} px-4 py-2 items-center ${notasActual ? 'bg-[#d44a80]' : 'bg-white'}`}
+          onClick={() => setNotasActual(true)}
+        >
+          NOTAS DE HOY
+        </Button>
+        <Button
+          size="large"
+          shape="round"
+          className={`w-full btn ${notasActual ? 'text-[#42BFF2]' : 'text-white'} px-4 py-2 items-center ml-4 ${!notasActual ? 'bg-[#d44a80]' : 'bg-white'}`}
+          onClick={() => setNotasActual(false)}
+        >
+          NOTAS HISTORICO
         </Button>
       </div>
+      <div className="content-container mt-4 p-6">
+        {
+          notasActual ?
+            <>
+              <div className="title flex justify-center py-4">
+                <Button
+                  size="large"
+                  shape="round"
+                  className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
+                  onClick={() => setNotaModalVisible(true)}>
+                  <PlusCircleOutlined className="mr-2" />
+                  Agregar Nota
+                </Button>
+              </div>
 
-      <Table id="miInventarioTable" columns={columns} dataSource={notas} size='small' />
-
+              <Table columns={columns} dataSource={notasActive} size='small' />
+            </>
+            :
+            <Table columns={columnsAll} dataSource={notas} size='small' className="mt-4" />
+        }
+      </div>
 
       <Modal
-        title={(<div className="text-2xl">Agregar Nota</div>)}
+        title={(<div className="text-2xl">{editingNota ? 'Editar nota' : 'Agregar nota'}</div>)}
         open={notaModalVisible}
         onOk={handleOkNota}
         onCancel={handleCancelNota}
@@ -130,7 +264,6 @@ const NotasPage = () => {
       >
         <Form
           form={formNota}
-          initialValues={{ motivo: '3' }}
           layout="vertical"
           className="mt-6"
         >
@@ -158,6 +291,14 @@ const NotasPage = () => {
             </Col>
           </Row>
         </Form>
+      </Modal>
+      <Modal
+        title="Confirmar eliminación"
+        open={confirmDeleteModalVisible}
+        onOk={handleDeleteConfirm}
+        onCancel={() => setConfirmDeleteModalVisible(false)}
+      >
+        <p>¿Estás seguro que quieres cancelar este ingreso al taller?</p>
       </Modal>
     </div>
   )

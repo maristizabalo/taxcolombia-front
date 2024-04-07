@@ -9,15 +9,6 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const items = [
   {
-    key: 1,
-    icon: <HomeOutlined />,
-    label: (
-      <Link to="/private">
-        Inicio
-      </Link>
-    ),
-  },
-  {
     key: 2,
     icon: <ToolOutlined />,
     label: (
@@ -81,7 +72,7 @@ const AppLayout = ({ children }) => {
           <Avatar size={64} icon={<UserOutlined />} className='bg-[#42bff2]' />
           <span className="ml-2 text-white">{nombreUsuario}</span>
         </div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} className='mt-32' />
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['2']} items={items} className='mt-32' />
       </Sider>
       <Layout style={{ marginLeft: 200 }}>
         <Header
