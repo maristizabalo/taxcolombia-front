@@ -81,3 +81,14 @@ export const mecanicoListService = async () => {
     }
 };
 
+export const motivoListService = async () => {
+    try {
+        const response = await api.get('mantenimiento/motivo/');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+
+

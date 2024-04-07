@@ -8,6 +8,7 @@ import TallerPage from './TallerPage';
 import InformePage from './InformePage';
 import AdministradorPage from './AdministradorPage';
 import NotasPage from './NotasPage';
+import PerfilPage from './PerfilPage';
 
 const Private = () => {
 
@@ -38,6 +39,7 @@ const Private = () => {
                 <Route path="/notas" element={<NotasPage />} />
                 <Route path="/informe" element={<InformePage />} />
                 <Route path="/administrador" element={<AdministradorPage />} />
+                <Route path="/perfil" element={<PerfilPage />} />
             </Routes>
         </AppLayout>
     )

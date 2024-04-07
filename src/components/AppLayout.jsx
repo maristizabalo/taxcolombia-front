@@ -1,4 +1,4 @@
-import { HomeOutlined, ToolOutlined, SnippetsOutlined, FormOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { ToolOutlined, SnippetsOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Image, Layout, Menu, theme } from 'antd';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -41,6 +41,15 @@ const items = [
     label: (
       <Link to="/private/administrador">
         Administrador
+      </Link>
+    ),
+  },
+  {
+    key: 6,
+    icon: <UserOutlined/>,
+    label: (
+      <Link to="/private/perfil">
+        Mi perfil
       </Link>
     ),
   },

@@ -1,6 +1,6 @@
-import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, TimePicker, notification } from "antd"
+import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, Tag, TimePicker, notification } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { carListService, createMantenimientoService, createMecanicoService, editMantenimientoService, mantenimientoActiveListService, mantenimientoListService, mecanicoListService } from '../services/carService';
+import { carListService, createMantenimientoService, createMecanicoService, editMantenimientoService, mantenimientoActiveListService, mantenimientoListService, mecanicoListService, motivoListService } from '../services/carService';
 import { useEffect, useState } from 'react';
 import { ESTADO_MANTENIMIENTO, MOTIVO } from "../utils/const";
 import { CloseCircleOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
@@ -8,11 +8,18 @@ import { openNotificationWithIcon } from "../utils/notification";
 import { useSelector } from "react-redux";
 import moment from "moment";
 
+const colorMap = {
+  1: 'gold', // EN PROCESO
+  2: 'green', // TERMINADO
+  3: 'red',   // CANCELADO
+};
+
 const TallerPage = () => {
   const [mantenimientos, setMantenimientos] = useState([])
   const [cars, setCars] = useState([])
   const [tallerActual, setTallerActual] = useState(true);
   const [mecanicos, setMecanicos] = useState([])
+  const [motivos, setMotivos] = useState([])
   const [entradaModalVisible, setEntradaModalVisible] = useState(false)
   const [mecanicoModalVisible, setMecanicoModalVisible] = useState(false)
   const [salidaModalVisible, setSalidaModalVisible] = useState(false)
@@ -82,7 +89,11 @@ const TallerPage = () => {
       dataIndex: 'estado_mantenimiento',
       key: 'estado',
       width: '5%',
-      render: estado => ESTADO_MANTENIMIENTO[estado]
+      render: estado => (
+        <Tag color={colorMap[estado]}>
+          {ESTADO_MANTENIMIENTO[estado]}
+        </Tag>
+      )
     }
   ]
   useEffect(() => {
@@ -90,6 +101,7 @@ const TallerPage = () => {
       fetchMantenimientosActivos();
       fetchCars();
       fetchMecanicos();
+      fetchMotivos();
     } else {
       fetchMantenimientos();
     }
@@ -118,6 +130,15 @@ const TallerPage = () => {
     try {
       const data = await mecanicoListService();
       setMecanicos(data);
+    } catch (error) {
+      console.error('Error fetching componentes', error);
+    }
+  };
+
+  const fetchMotivos = async () => {
+    try {
+      const data = await motivoListService();
+      setMotivos(data);
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -376,7 +397,7 @@ const TallerPage = () => {
       >
         <Form
           form={formEntrada}
-          initialValues={{ motivo: '3' }}
+          initialValues={{ motivo: 3 }}
           layout="vertical"
           className="mt-6"
         >
@@ -384,8 +405,8 @@ const TallerPage = () => {
             <Col span={12}>
               <Form.Item name="motivo" label="Motivo">
                 <Select>
-                  {Object.entries(MOTIVO).map(([key, value]) => (
-                    <Select.Option key={key} value={key}>{value}</Select.Option>
+                  {motivos.map((motivo) => (
+                    <Select.Option key={motivo.id} value={motivo.id}>{motivo.nombre}</Select.Option>
                   ))}
                 </Select>
               </Form.Item>

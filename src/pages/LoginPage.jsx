@@ -20,7 +20,6 @@ const Login = () => {
     nombre: ''
   });
   const [formLogin] = Form.useForm()
-  const [formRegister] = Form.useForm()
   const [loginMode, setLoginMode] = useState(true)
 
   useEffect(() => {

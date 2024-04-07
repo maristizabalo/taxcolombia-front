@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Modal, Row, Select, Table, notification } from "antd"
+import { Button, Col, Form, Input, Modal, Row, Select, Table, Tag, notification } from "antd"
 import { PlusCircleOutlined, EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { carListService, } from '../services/carService';
 import { useEffect, useState } from 'react';
@@ -148,7 +148,11 @@ const NotasPage = () => {
       dataIndex: 'is_active',
       key: 'active',
       width: '10%',
-      render: is_active => is_active ? 'REGISTRADO' : 'CANCELADO'
+      render: is_active => (
+        <Tag color={is_active ? 'green' : 'red'}>
+          {is_active ? 'Registrado' : 'Cancelado'}
+        </Tag>
+      )
     },
   ]
 
