@@ -1,23 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Modal, Tooltip, Tag } from 'antd';
+import { useEffect, useState } from 'react';
+import { Table, Modal, Tooltip, Tag, Form, Input, Select, notification } from 'antd';
 import { EditOutlined, CloseCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { userListService, deactivateUserService, activateUserService } from '../services/authServices';
+import { userListService, deactivateUserService, activateUserService, editUserService, rolListService } from '../services/authServices';
 import { useSelector } from 'react-redux';
 import { ROLES, ROLES_TEXT } from '../utils/const';
+import { openNotificationWithIcon } from '../utils/notification';
 
 const Usuarios = () => {
     const [users, setUsers] = useState([]);
+    const [roles, setRoles] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [modalActivateVisible, setModalActivateVisible] = useState(false)
+    const [modalEditVisible, setModalEditVisible] = useState(false)
     const userRol = useSelector((store) => store.userInfo.user.rol);
     const isAdmin = ROLES.ADMIN === userRol;
+    const [formUser] = Form.useForm();
 
     useEffect(() => {
         fetchUsers();
+        fetchRoles();
     }, []);
 
     const openEditModal = (record) => {
-        console.log('Editar usuario:', record);
+        formUser.setFieldsValue({
+            username: record.username,
+            nombre: record.nombre,
+            rol: record.rol
+        })
+        setSelectedUser(record)
+        setModalEditVisible(true)
     };
 
     const modalDesactivar = (record) => {
@@ -37,6 +48,23 @@ const Usuarios = () => {
             setModalActivateVisible(false)
         }
     };
+
+    const editUser = async () => {
+        try {
+            const payload = formUser.getFieldsValue();
+            console.log(payload)
+            await editUserService(selectedUser.id, payload);
+        } catch (error) {
+            console.error('Error al editar usuario:', error);
+        } finally {
+            openNotificationWithIcon(notification, 'success', 'Usuario editado exitosamente', '', 4)
+            setSelectedUser(null);
+            formUser.resetFields()
+            fetchUsers();
+            setModalEditVisible(false)
+        }
+    };
+
 
     const handleActivar = async () => {
         try {
@@ -83,7 +111,7 @@ const Usuarios = () => {
             key: 'estado',
             render: is_active => (
                 <Tag color={is_active ? 'green' : 'red'}>
-                  {is_active ? 'Activo' : 'Inactivo'}
+                    {is_active ? 'Activo' : 'Inactivo'}
                 </Tag>
             ),
             width: '5%',
@@ -102,13 +130,13 @@ const Usuarios = () => {
                             {record.is_active ? (
                                 <span key="desactivar" className="text-[#d44a80] font-bold hover:bg-gray-100" onClick={() => modalDesactivar(record)}>
                                     <Tooltip title={'Desactivar'}>
-                                    <CloseCircleOutlined className="text-lg mr-1" />
+                                        <CloseCircleOutlined className="text-lg mr-1" />
                                     </Tooltip>
                                 </span>
                             ) : (
                                 <span key="activar" className="text-[#42bff2] font-bold hover:bg-gray-100" onClick={() => modalDesactivar(record)}>
                                     <Tooltip title={'Activar'}>
-                                    <CheckCircleOutlined className="text-lg mr-1" />
+                                        <CheckCircleOutlined className="text-lg mr-1" />
                                     </Tooltip>
                                 </span>
                             )}
@@ -131,14 +159,56 @@ const Usuarios = () => {
         }
     };
 
+    const fetchRoles = async () => {
+        try {
+            const data = await rolListService();
+            setRoles(data);
+        } catch (error) {
+            console.error('Error al obtener lista de usuarios:', error);
+        }
+    };
+
+    const onCancelActivateModal = () => {
+        setModalActivateVisible(false)
+        setSelectedUser(null)
+    }
+
+    const onCancelEditModal = () => {
+        setModalEditVisible(false)
+        setSelectedUser(null)
+    }
+
+
     return (
         <div>
             <Table columns={columns} dataSource={users} />
             <Modal
+                title="Editar Usuario"
+                open={modalEditVisible}
+                onOk={editUser}
+                onCancel={onCancelEditModal}
+            >
+                <Form form={formUser} layout="vertical">
+                    <Form.Item name="username" label="Username">
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="nombre" label="Nombre">
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="rol" label="Rol">
+                        <Select>
+                            {roles.map((rol) => (
+                                <Select.Option key={rol.id} value={rol.id}>{rol.nombre}</Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
+            <Modal
                 title="Desactivar/Activar Usuario"
                 open={modalActivateVisible}
                 onOk={selectedUser?.is_active ? handleDesactivar : handleActivar}
-                onCancel={() => setSelectedUser(null)}
+                onCancel={onCancelActivateModal}
             >
                 <p>{selectedUser ? '¿Estás seguro que quieres desactivar/activar este usuario?' : ''}</p>
             </Modal>

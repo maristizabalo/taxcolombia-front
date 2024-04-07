@@ -10,7 +10,7 @@ const Motivos = () => {
 
     const [motivos, setMotivos] = useState()
     const userRol = useSelector((store) => store.userInfo.user.rol)
-
+    const [modalActivateVisible, setModalActivateVisible] = useState(false)
 
     useEffect(() => {
         fetchMotivos();
@@ -47,7 +47,6 @@ const Motivos = () => {
             key: 'acciones',
             width: '5%',
             render: (text, record) => {
-              if (isAdmin) {
                 return (
                   <>
                     <span key="editar" className="text-[#000000] font-bold hover:bg-gray-100" onClick={() => openEditModal(record)}>
@@ -58,11 +57,8 @@ const Motivos = () => {
                     </span>
                   </>
                 );
-              }
-      
-              return null;
             },
-        },
+          },
     
     ]
     

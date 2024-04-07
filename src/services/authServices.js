@@ -27,6 +27,17 @@ export const changePasswordService = async (id, values) => {
     }
 };
 
+
+
+export const editUserService = async (id, values) => {
+    try {
+        const response = await api.patch(`accounts/user/${id}/`, values);
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 export const activateUserService = async (id) => {
     try {
         const payload = {
@@ -54,6 +65,15 @@ export const deactivateUserService = async (id) => {
 export const userListService = async () => {
     try {
         const response = await api.get('accounts/user/');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const rolListService = async () => {
+    try {
+        const response = await api.get('accounts/rol/');
         return response.data;
     } catch (error) {
         console.log(error)

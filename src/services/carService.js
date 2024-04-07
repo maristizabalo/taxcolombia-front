@@ -20,7 +20,7 @@ export const createCarService = async (values) => {
 
 export const editCarService = async (id, values) => {
     try {
-        const response = await api.put(`car/${id}/`, values)
+        const response = await api.patch(`car/${id}/`, values)
         return response.data;
     } catch (error) {
         console.log(error)
@@ -66,6 +66,15 @@ export const editMantenimientoService = async (id, values) => {
 export const createMecanicoService = async (values) => {
     try {
         const response = await api.post('mantenimiento/mecanico/', values)
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const editMecanicoService = async (id, values) => {
+    try {
+        const response = await api.patch(`mantenimiento/mecanico/${id}/`, values)
         return response.data;
     } catch (error) {
         console.log(error)
