@@ -344,6 +344,7 @@ const TallerPage = () => {
                         </div>
                         <div>
                           {MOTIVO[mantenimiento.motivo]}
+
                         </div>
                       </>)}
                       style={{
@@ -405,7 +406,7 @@ const TallerPage = () => {
             <Col span={12}>
               <Form.Item name="motivo" label="Motivo">
                 <Select>
-                  {motivos.map((motivo) => (
+                  {motivos.filter(motivo => motivo.is_active).map((motivo) => (
                     <Select.Option key={motivo.id} value={motivo.id}>{motivo.nombre}</Select.Option>
                   ))}
                 </Select>
@@ -419,8 +420,8 @@ const TallerPage = () => {
                     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                   }
                 >
-                  {cars.map(car => (
-                    <Select.Option key={car.id} value={car.id}>{`${car.placa} - ${car.movil}`}</Select.Option>
+                  {cars.filter(car => car.is_active).map(car => (
+                    <Select.Option key={car.id} value={car.id} >{`${car.placa} - ${car.movil}`}</Select.Option>
                   ))}
                 </Select>
               </Form.Item>

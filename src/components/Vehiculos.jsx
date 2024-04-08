@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CloseCircleOutlined, CheckCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, Table, Tag, Tooltip, notification } from 'antd';
-import { carListService, createCarService, editCarService } from '../services/carService';
+import { carAllListService, carListService, createCarService, editCarService } from '../services/carService';
 import { openNotificationWithIcon } from '../utils/notification';
 const Vehiculos = () => {
 
@@ -79,7 +79,7 @@ const Vehiculos = () => {
 
     const fetchCars = async () => {
         try {
-            const data = await carListService();
+            const data = await carAllListService();
             setCars(data);
         } catch (error) {
             console.error('Error fetching componentes', error);

@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react'
-import { EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Modal, Table, Tag, Tooltip, notification } from 'antd';
-import { useSelector } from 'react-redux';
-import { ROLES } from '../utils/const';
-import { editMecanicoService, mecanicoListService } from '../services/carService';
+import { EditOutlined, CloseCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { Form, Input, Modal, Table, Tag, Tooltip, notification } from 'antd';
+import { editMecanicoService, mecanicoActiveListService, mecanicoListService } from '../services/carService';
 import { openNotificationWithIcon } from '../utils/notification';
 
 
 const Mecanicos = () => {
 
     const [mecanicos, setMecanicos] = useState()
-    const userRol = useSelector((store) => store.userInfo.user.rol)
     const [modalActivateVisible, setModalActivateVisible] = useState(false)
     const [formMecanico] = Form.useForm();
     const [modalEditVisible, setModalEditVisible] = useState(false)
@@ -19,6 +16,14 @@ const Mecanicos = () => {
     useEffect(() => {
         fetchMecanicos();
     }, []);
+
+    const openEditModal = (record) => {
+        formMecanico.setFieldsValue({
+            nombre: record.nombre
+        })
+        setSelectedMecanico(record)
+        setModalEditVisible(true)
+    }
 
     const editMecanico = async () => {
         try {
@@ -29,10 +34,49 @@ const Mecanicos = () => {
             console.error('Error al editar mecanico:', error);
         } finally {
             openNotificationWithIcon(notification, 'success', 'Mecanico editado exitosamente', '', 4)
-            setSelectedMecanico(null);
             formMecanico.resetFields()
             fetchMecanicos();
+            setSelectedMecanico(null);
             setModalEditVisible(false)
+        }
+    };
+
+    const modalDesactivar = (record) => {
+        setSelectedMecanico(record);
+        setModalActivateVisible(true)
+    };
+
+    const handleActivar = async () => {
+        try {
+            const payload = {
+                is_active: true
+            }
+            await editMecanicoService(selectedMecanico.id, payload);
+            console.log('Mecanico activado:', selectedMecanico);
+            fetchMecanicos();
+        } catch (error) {
+            console.error('Error al activar mecanico:', error);
+        } finally {
+            openNotificationWithIcon(notification, 'success', 'Mecanico activado correctamente.', '', 4)
+            setSelectedMecanico(null);
+            setModalActivateVisible(false)
+        }
+    };
+
+    const handleDesactivar = async () => {
+        try {
+            const payload = {
+                is_active: false
+            }
+            await editMecanicoService(selectedMecanico.id, payload);
+            console.log('Mecanico desactivado:', selectedMecanico);
+            fetchMecanicos();
+        } catch (error) {
+            console.error('Error al desactivar usuario:', error);
+        } finally {
+            openNotificationWithIcon(notification, 'success', 'Mecanico desactivado correctamente.', '', 4)
+            setSelectedMecanico(null);
+            setModalActivateVisible(false)
         }
     };
 
@@ -93,7 +137,7 @@ const Mecanicos = () => {
 
     const fetchMecanicos = async () => {
         try {
-            const data = await mecanicoListService();
+            const data = await mecanicoActiveListService();
             setMecanicos(data);
         } catch (error) {
             console.error('Error fetching componentes', error);
@@ -134,7 +178,7 @@ const Mecanicos = () => {
                 onOk={selectedMecanico?.is_active ? handleDesactivar : handleActivar}
                 onCancel={onCancelActivateModal}
             >
-                <p>{selectedUser ? '¿Estás seguro que quieres desactivar/activar este usuario?' : ''}</p>
+                <p>{selectedMecanico ? '¿Estás seguro que quieres desactivar/activar este usuario?' : ''}</p>
             </Modal>
         </div>
     )

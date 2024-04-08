@@ -9,6 +9,15 @@ export const carListService = async () => {
     }
 };
 
+export const carAllListService = async () => {
+    try {
+        const response = await api.get('car/all');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 export const createCarService = async (values) => {
     try {
         const response = await api.post('car/', values)
@@ -90,9 +99,36 @@ export const mecanicoListService = async () => {
     }
 };
 
+export const mecanicoActiveListService = async () => {
+    try {
+        const response = await api.get('mantenimiento/mecanico/all');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 export const motivoListService = async () => {
     try {
         const response = await api.get('mantenimiento/motivo/');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const motivoActiveListService = async () => {
+    try {
+        const response = await api.get('mantenimiento/motivo/all');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const editMotivoService = async (id, values) => {
+    try {
+        const response = await api.patch(`mantenimiento/motivo/${id}/`, values)
         return response.data;
     } catch (error) {
         console.log(error)
