@@ -135,5 +135,27 @@ export const editMotivoService = async (id, values) => {
     }
 };
 
+export const informeListService = async () => {
+    try {
+        const response = await api.get('mantenimiento/informe');
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+export const informeDetailService = async (fecha, placa) => {
+    try {
+        const payload = {
+            fecha: fecha,
+            vehiculo: placa
+        }
+        const response = await api.post('mantenimiento/informe', payload);
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 
 

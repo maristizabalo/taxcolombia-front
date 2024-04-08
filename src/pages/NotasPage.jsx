@@ -27,10 +27,7 @@ const NotasPage = () => {
       fetchNotas();
     }
   }, [notasActual]);
-  useEffect(() => {
-
-  }, []);
-
+  
   const openEditModal = (nota) => {
     setEditingNota(nota);
     setNotaModalVisible(true)

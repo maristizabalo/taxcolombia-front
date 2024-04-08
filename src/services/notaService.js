@@ -18,6 +18,8 @@ export const notaListService = async () => {
     }
 };
 
+
+
 export const createNotaService = async (values) => {
     try {
         const response = await api.post('nota/', values)
