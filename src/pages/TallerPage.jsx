@@ -152,7 +152,6 @@ const TallerPage = () => {
     } else {
       // Si hay un valor de placa, filtra los mantenimientos por esa placa
       const filtered = mantenimientos.filter(mantenimiento => mantenimiento.vehiculo_placa.toLowerCase().includes(value.toLowerCase()));
-      console.log(filtered)
       setFilteredMantenimientos(filtered);
     }
   };
@@ -162,7 +161,6 @@ const TallerPage = () => {
     setEntradaModalVisible(true);
     formEntrada.setFieldValue("motivo", mantenimiento.motivo)
     formEntrada.setFieldValue("vehiculo", mantenimiento.vehiculo)
-    console.log(mantenimiento.fecha_ingreso)
     const fechaIngreso = moment(mantenimiento.fecha_ingreso);
     formEntrada.setFieldValue("fecha_ingreso", fechaIngreso)
     formEntrada.setFieldValue("observacion", mantenimiento.observacion)
@@ -172,7 +170,6 @@ const TallerPage = () => {
     try {
       const data = await carListService();
       setCars(data);
-      console.log(data)
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -180,29 +177,35 @@ const TallerPage = () => {
 
   const handleOkEntrada = async () => {
     try {
-      const values = formEntrada.getFieldsValue();
-      const payload = {
-        ...values,
-        registrado_por: userId
-      };
+      // Validar los campos del formulario antes de continuar
+      formEntrada
+        .validateFields()
+        .then(async (values) => {
+          const payload = {
+            ...values,
+            registrado_por: userId
+          };
 
-      if (editingMantenimiento) {
-        // Si hay un mantenimiento en edición, se actualiza en lugar de crear uno nuevo
-        await editMantenimientoService(editingMantenimiento.id, payload);
-        openNotificationWithIcon(notification, 'success', 'Mantenimiento actualizado exitosamente', '', 4);
-      } else {
-        // Si no hay un mantenimiento en edición, se crea uno nuevo
-        await createMantenimientoService(payload);
-        openNotificationWithIcon(notification, 'success', 'Entrada a taller registrada exitosamente', '', 4);
-      }
-
-      // Se cierra el modal y se actualiza la lista de mantenimientos
-      setEntradaModalVisible(false);
-      fetchMantenimientosActivos();
-      formEntrada.resetFields();
-      setEditingMantenimiento(null); // Limpiar el mantenimiento en edición
+          if (editingMantenimiento) {
+            // Si hay un mantenimiento en edición, se actualiza en lugar de crear uno nuevo
+            await editMantenimientoService(editingMantenimiento.id, payload);
+            openNotificationWithIcon(notification, 'success', 'Mantenimiento actualizado exitosamente', '', 4);
+          } else {
+            // Si no hay un mantenimiento en edición, se crea uno nuevo
+            await createMantenimientoService(payload);
+            openNotificationWithIcon(notification, 'success', 'Entrada a taller registrada exitosamente', '', 4);
+          }
+          setEntradaModalVisible(false);
+          fetchMantenimientosActivos();
+          formEntrada.resetFields();
+          setEditingMantenimiento(null); // Limpiar el mantenimiento en edición
+        })
+        .catch((error) => {
+          console.error('Error en la validación del formulario:', error);
+          openNotificationWithIcon(notification, 'error', 'Por favor complete todos los campos requeridos', '', 4);
+        });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       openNotificationWithIcon(notification, 'error', 'Error al registrar entrada', '', 4);
     }
   };
@@ -215,41 +218,54 @@ const TallerPage = () => {
 
   const handleOkMecanico = async () => {
     try {
-      const values = formMecanico.getFieldsValue();
-      const payload = {
-        nombre: values.nombre
-      };
-      console.log(payload)
-      await createMecanicoService(payload);
-      openNotificationWithIcon(notification, 'success', 'Mecanico registrado de forma exitosa', '', 4)
-      setMecanicoModalVisible(false);
-      fetchMecanicos();
-      formMecanico.resetFields()
+      // Validar los campos del formulario antes de continuar
+      formMecanico
+        .validateFields()
+        .then(async (values) => {
+          const payload = {
+            nombre: values.nombre
+          };
+          await createMecanicoService(payload);
+          openNotificationWithIcon(notification, 'success', 'Mecanico registrado de forma exitosa', '', 4)
+          setMecanicoModalVisible(false);
+          fetchMecanicos();
+          formMecanico.resetFields();
+        })
+        .catch((error) => {
+          openNotificationWithIcon(notification, 'error', 'Por favor complete todos los campos requeridos', '', 4);
+          console.error('Error en la validación del formulario:', error);
+        });
     } catch (error) {
-
-      console.log(error)
-      openNotificationWithIcon(notification, 'error', 'Error al registrar entrada', '', 4)
+      console.error(error)
+      openNotificationWithIcon(notification, 'error', 'Error al registrar mecanico', '', 4)
     }
   };
 
   const handleOkSalida = async () => {
     try {
-      const values = formSalida.getFieldsValue();
-      const payload = {
-        ...values,
-        realizado_por: values.realizado_por,
-        estado_mantenimiento: 2
-      };
-      console.log(payload)
-      await editMantenimientoService(idSalida, payload);
-      openNotificationWithIcon(notification, 'success', 'Salida de taller registrada correctamente.', '', 4)
-      setSalidaModalVisible(false);
-      fetchMantenimientosActivos();
-      formSalida.resetFields()
-      setIdSalida('')
+      // Validar los campos del formulario antes de continuar
+      formSalida
+        .validateFields()
+        .then(async (values) => {
+          const payload = {
+            ...values,
+            realizado_por: values.realizado_por,
+            estado_mantenimiento: 2
+          };
+          await editMantenimientoService(idSalida, payload);
+          openNotificationWithIcon(notification, 'success', 'Salida de taller registrada correctamente.', '', 4)
+          setSalidaModalVisible(false);
+          fetchMantenimientosActivos();
+          formSalida.resetFields()
+          setIdSalida('')
+        })
+        .catch((error) => {
+          openNotificationWithIcon(notification, 'error', 'Por favor complete todos los campos requeridos', '', 4);
+          console.error('Error en la validación del formulario:', error);
+        });
     } catch (error) {
-      console.log(error)
-      openNotificationWithIcon(notification, 'error', 'Error al registrar entrada', '', 4)
+      console.error(error)
+      openNotificationWithIcon(notification, 'error', 'Error al registrar salida', '', 4)
     }
   };
 
@@ -404,14 +420,18 @@ const TallerPage = () => {
         >
           <Row gutter={16} >
             <Col span={12}>
-              <Form.Item name="motivo" label="Motivo">
+              <Form.Item
+                name="motivo"
+                label="Motivo"
+                rules={[{ required: true, message: 'Por seleccione un motivo' }]}
+              >
                 <Select>
                   {motivos.filter(motivo => motivo.is_active).map((motivo) => (
                     <Select.Option key={motivo.id} value={motivo.id}>{motivo.nombre}</Select.Option>
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="vehiculo" label="Vehiculo">
+              <Form.Item name="vehiculo" label="Vehiculo" rules={[{ required: true, message: 'Por seleccione un vehiculo' }]}>
                 <Select
                   showSearch
                   placeholder="Busca por movil o placa"
@@ -425,12 +445,12 @@ const TallerPage = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="fecha_ingreso" label="Hora de ingreso">
+              <Form.Item name="fecha_ingreso" label="Hora de ingreso" rules={[{ required: true, message: 'Por seleccione una hora de ingreso' }]}>
                 <TimePicker use12Hours minuteStep={15} format='hh:mm A' changeOnScroll needConfirm={false} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="observacion" label="Observación">
+              <Form.Item name="observacion" label="Observación" rules={[{ required: true, message: 'Por favor escriba una observacion' }]}>
                 <Input.TextArea rows={8} />
               </Form.Item>
             </Col>
@@ -444,7 +464,7 @@ const TallerPage = () => {
         onCancel={() => setMecanicoModalVisible(false)}
       >
         <Form form={formMecanico} layout="vertical">
-          <Form.Item name="nombre" label="Nombre mecanico">
+          <Form.Item name="nombre" label="Nombre mecanico" rules={[{ required: true, message: 'Por escriba el nombre del mecanico' }]}>
             <Input />
           </Form.Item>
         </Form>
@@ -457,7 +477,7 @@ const TallerPage = () => {
 
       >
         <Form form={formSalida} layout="vertical">
-          <Form.Item name="realizado_por" label="Mecanico">
+          <Form.Item name="realizado_por" label="Mecanico" rules={[{ required: true, message: 'Por seleccione un mecanico' }]}>
             <Select
               showSearch
               placeholder="Busca mecanico"
@@ -471,7 +491,7 @@ const TallerPage = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="fecha_salida" label="Hora de salida">
+          <Form.Item name="fecha_salida" label="Hora de salida" rules={[{ required: true, message: 'Por seleccione una fecha de salida' }]}>
             <TimePicker use12Hours minuteStep={15} format='hh:mm A' changeOnScroll needConfirm={false} />
           </Form.Item>
           <Form.Item name="observacion_salida" label="¿Que se le hizo al carro?">

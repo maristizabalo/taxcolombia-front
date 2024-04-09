@@ -164,32 +164,38 @@ const NotasPage = () => {
 
   const handleOkNota = async () => {
     try {
-      const values = formNota.getFieldsValue();
-      const payload = {
-        ...values,
-        registrado_por: userId
-      };
-
-      if (editingNota) {
-        await editNotaService(editingNota.id, payload);
-        openNotificationWithIcon(notification, 'success', 'Nota actualizada exitosamente', '', 4);
-        setNotaModalVisible(false);
-        fetchNotasActive();
-        formNota.resetFields()
-      } else {
-        await createNotaService(payload);
-        openNotificationWithIcon(notification, 'success', 'Nota agregada correctamente', '', 4)
-        setNotaModalVisible(false);
-        fetchNotasActive();
-        formNota.resetFields()
-      }
-
-      setEditingNota(null); // Limpiar el mantenimiento en edición
+      // Validar los campos del formulario antes de continuar
+      formNota
+        .validateFields()
+        .then(async (values) => {
+          const payload = {
+            ...values,
+            registrado_por: userId
+          };
+  
+          if (editingNota) {
+            await editNotaService(editingNota.id, payload);
+            openNotificationWithIcon(notification, 'success', 'Nota actualizada exitosamente', '', 4);
+          } else {
+            await createNotaService(payload);
+            openNotificationWithIcon(notification, 'success', 'Nota agregada correctamente', '', 4)
+          }
+          
+          setNotaModalVisible(false);
+          fetchNotasActive();
+          formNota.resetFields()
+          setEditingNota(null); // Limpiar el mantenimiento en edición
+        })
+        .catch((error) => {
+          console.error('Error en la validación del formulario:', error);
+          openNotificationWithIcon(notification, 'error', 'Por favor complete todos los campos requeridos', '', 4);
+        });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       openNotificationWithIcon(notification, 'error', 'Error al registrar nota', '', 4);
     }
   };
+  
 
   const handleCancelNota = () => {
     setNotaModalVisible(false)
@@ -270,7 +276,7 @@ const NotasPage = () => {
         >
           <Row gutter={16} >
             <Col span={12}>
-              <Form.Item name="vehiculo" label="Vehiculo">
+              <Form.Item name="vehiculo" label="Vehiculo" rules={[{ required: true, message: 'Seleccione un vehiculo' }]}>
                 <Select
                   showSearch
                   placeholder="Busca por movil o placa"
@@ -286,7 +292,7 @@ const NotasPage = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="nota" label="Nota">
+              <Form.Item name="nota" label="Nota" rules={[{ required: true, message: 'Por favor escriba una nota' }]}>
                 <Input.TextArea rows={8} />
               </Form.Item>
             </Col>

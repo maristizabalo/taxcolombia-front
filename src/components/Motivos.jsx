@@ -28,7 +28,6 @@ const Motivos = () => {
     const editMotivo = async () => {
         try {
             const payload = formMotivo.getFieldsValue();
-            console.log(payload)
             await editMotivoService(selectedMotivo.id, payload);
         } catch (error) {
             console.error('Error al editar motivo:', error);
@@ -52,7 +51,6 @@ const Motivos = () => {
                 is_active: true
             }
             await editMotivoService(selectedMotivo.id, payload);
-            console.log('Motivo activado:', selectedMotivo);
             fetchMotivos();
         } catch (error) {
             console.error('Error al activar motivo:', error);
@@ -69,7 +67,6 @@ const Motivos = () => {
                 is_active: false
             }
             await editMotivoService(selectedMotivo.id, payload);
-            console.log('Motivo desactivado:', selectedMotivo);
             fetchMotivos();
         } catch (error) {
             console.error('Error al desactivar usuario:', error);

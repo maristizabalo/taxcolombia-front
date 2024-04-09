@@ -16,7 +16,6 @@ const InformePage = () => {
     try {
       const data = await carListService();
       setCars(data);
-      console.log(data)
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -43,11 +42,9 @@ const InformePage = () => {
   };
 
   const handleDownloadFilteredReport = () => {
-    console.log('Descargar informe con filtros');
   };
 
   const handleDownloadTodayReport = () => {
-    console.log('Descargar informe de hoy');
   };
 
   const columns = [

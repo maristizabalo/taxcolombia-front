@@ -39,7 +39,6 @@ const Usuarios = () => {
     const handleDesactivar = async () => {
         try {
             await deactivateUserService(selectedUser.id);
-            console.log('Usuario desactivado:', selectedUser);
             fetchUsers(); // Actualizar lista de usuarios después de desactivar
         } catch (error) {
             console.error('Error al desactivar usuario:', error);
@@ -52,7 +51,6 @@ const Usuarios = () => {
     const editUser = async () => {
         try {
             const payload = formUser.getFieldsValue();
-            console.log(payload)
             await editUserService(selectedUser.id, payload);
         } catch (error) {
             console.error('Error al editar usuario:', error);
@@ -69,7 +67,6 @@ const Usuarios = () => {
     const handleActivar = async () => {
         try {
             await activateUserService(selectedUser.id);
-            console.log('Usuario activado:', selectedUser);
             fetchUsers(); // Actualizar lista de usuarios después de activar
         } catch (error) {
             console.error('Error al activar usuario:', error);
@@ -152,7 +149,6 @@ const Usuarios = () => {
     const fetchUsers = async () => {
         try {
             const data = await userListService();
-            console.log(data);
             setUsers(data);
         } catch (error) {
             console.error('Error al obtener lista de usuarios:', error);

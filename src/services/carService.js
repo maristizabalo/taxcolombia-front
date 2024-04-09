@@ -5,7 +5,7 @@ export const carListService = async () => {
         const response = await api.get('car/');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -14,7 +14,7 @@ export const carAllListService = async () => {
         const response = await api.get('car/all');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -23,7 +23,7 @@ export const createCarService = async (values) => {
         const response = await api.post('car/', values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -32,7 +32,7 @@ export const editCarService = async (id, values) => {
         const response = await api.patch(`car/${id}/`, values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -41,7 +41,7 @@ export const mantenimientoActiveListService = async () => {
         const response = await api.get('mantenimiento/');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -50,7 +50,7 @@ export const mantenimientoListService = async () => {
         const response = await api.get('mantenimiento/all');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -59,7 +59,7 @@ export const createMantenimientoService = async (values) => {
         const response = await api.post('mantenimiento/', values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -68,7 +68,7 @@ export const editMantenimientoService = async (id, values) => {
         const response = await api.patch(`mantenimiento/${id}/`, values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -77,7 +77,7 @@ export const createMecanicoService = async (values) => {
         const response = await api.post('mantenimiento/mecanico/', values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -86,7 +86,7 @@ export const editMecanicoService = async (id, values) => {
         const response = await api.patch(`mantenimiento/mecanico/${id}/`, values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -95,7 +95,7 @@ export const mecanicoListService = async () => {
         const response = await api.get('mantenimiento/mecanico/');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -104,7 +104,7 @@ export const mecanicoActiveListService = async () => {
         const response = await api.get('mantenimiento/mecanico/all');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -113,7 +113,7 @@ export const motivoListService = async () => {
         const response = await api.get('mantenimiento/motivo/');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -122,7 +122,7 @@ export const motivoActiveListService = async () => {
         const response = await api.get('mantenimiento/motivo/all');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -131,7 +131,7 @@ export const editMotivoService = async (id, values) => {
         const response = await api.patch(`mantenimiento/motivo/${id}/`, values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -140,7 +140,7 @@ export const informeListService = async () => {
         const response = await api.get('mantenimiento/informe');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -153,7 +153,7 @@ export const informeDetailService = async (fecha, placa) => {
         const response = await api.post('mantenimiento/informe', payload);
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 

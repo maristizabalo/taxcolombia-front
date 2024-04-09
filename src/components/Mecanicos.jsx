@@ -28,7 +28,6 @@ const Mecanicos = () => {
     const editMecanico = async () => {
         try {
             const payload = formMecanico.getFieldsValue();
-            console.log(payload)
             await editMecanicoService(selectedMecanico.id, payload);
         } catch (error) {
             console.error('Error al editar mecanico:', error);
@@ -52,7 +51,6 @@ const Mecanicos = () => {
                 is_active: true
             }
             await editMecanicoService(selectedMecanico.id, payload);
-            console.log('Mecanico activado:', selectedMecanico);
             fetchMecanicos();
         } catch (error) {
             console.error('Error al activar mecanico:', error);
@@ -69,7 +67,6 @@ const Mecanicos = () => {
                 is_active: false
             }
             await editMecanicoService(selectedMecanico.id, payload);
-            console.log('Mecanico desactivado:', selectedMecanico);
             fetchMecanicos();
         } catch (error) {
             console.error('Error al desactivar usuario:', error);

@@ -5,7 +5,7 @@ export const notaActiveListService = async () => {
         const response = await api.get('nota/');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -14,7 +14,7 @@ export const notaListService = async () => {
         const response = await api.get('nota/all');
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -25,7 +25,7 @@ export const createNotaService = async (values) => {
         const response = await api.post('nota/', values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -34,6 +34,6 @@ export const editNotaService = async (id, values) => {
         const response = await api.patch(`nota/${id}/`, values)
         return response.data;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
