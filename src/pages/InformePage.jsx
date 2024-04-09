@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Table, DatePicker, Button, Form, Select } from 'antd';
 import { carListService, informeDetailService, informeListService } from '../services/carService';
+import * as XLSX from "xlsx"
+import { saveAs } from 'file-saver';
 
 const InformePage = () => {
   const [informe, setInforme] = useState([]);
   const [cars, setCars] = useState([])
   const [form] = Form.useForm();
+  const [filtroAplicado, setFiltroAplicado] = useState(false); // Estado para controlar si se ha aplicado algún filtro
 
   useEffect(() => {
     fetchInforme();
@@ -34,17 +37,42 @@ const InformePage = () => {
     try {
       const values = await form.validateFields();
       const { fecha, placa } = values;
+
+      // Verificar si ambos campos están vacíos
+      if (!fecha && !placa) {
+        // Si ambos campos están vacíos, restablecer el estado del informe y desactivar el estado de filtro aplicado
+        fetchInforme()
+        setFiltroAplicado(false);
+        return;
+      }
+
+      // Si al menos un campo tiene valor, aplicar los filtros y actualizar el estado del informe
       const data = await informeDetailService(fecha, placa);
       setInforme(data);
+      setFiltroAplicado(true); // Activar el estado de filtro aplicado
     } catch (error) {
       console.error('Error applying filter', error);
     }
   };
 
-  const handleDownloadFilteredReport = () => {
-  };
-
   const handleDownloadTodayReport = () => {
+    const today = new Date().toLocaleDateString('es-ES').split('/').reverse().join('-');
+
+    const data = [
+      ["AÑO", "MES", "DIA", "NOVEDAD"],
+      ...informe.map(inform => [inform.AÑO, inform.MES, inform.DIA, inform.NOVEDAD])
+    ];
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet 1");
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+
+    // Nombrar el archivo con el nombre "INFORME" seguido de la fecha de hoy
+    saveAs(blob, `INFORME ${today}.xlsx`);
   };
 
   const columns = [
@@ -58,7 +86,6 @@ const InformePage = () => {
 
   return (
     <div className="container">
-      <h1 className="text-center my-4">Informe Seleccionador de Filtros</h1>
       <div className="flex justify-center my-4">
         <Form form={form} layout="inline">
           <Form.Item name="fecha">
@@ -69,6 +96,7 @@ const InformePage = () => {
               showSearch
               placeholder="Busca por movil o placa"
               optionFilterProp="children"
+              allowClear
               filterOption={(input, option) =>
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
@@ -87,12 +115,8 @@ const InformePage = () => {
           </Form.Item>
         </Form>
 
-
-        <Button type="primary" onClick={handleDownloadFilteredReport}>
-          Descargar informe con filtros
-        </Button>
-        <Button type="primary" className="ml-4" onClick={handleDownloadTodayReport}>
-          Descargar informe de hoy
+        <Button type="primary" onClick={handleDownloadTodayReport} className="ml-4 bg-[#d44a80]">
+          Descargar informe
         </Button>
       </div>
 

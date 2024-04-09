@@ -150,7 +150,7 @@ export const informeDetailService = async (fecha, placa) => {
             fecha: fecha,
             vehiculo: placa
         }
-        const response = await api.post('mantenimiento/informe', payload);
+        const response = await api.post('mantenimiento/informe/', payload);
         return response.data;
     } catch (error) {
         console.error(error)
