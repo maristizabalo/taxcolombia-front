@@ -34,9 +34,18 @@ const Login = () => {
       const result = await login(values);
       const user = jwtDecode(result.access);
       user['auth_tokens'] = result;
+      console.log(user)
       dispatch(createUser(user));
       openNotificationWithIcon(notification, 'success', 'Inicio de sesión exitoso', '', 4);
-      navigate('/private/taller')
+      
+      // Determinar la ruta de redireccionamiento según el rol del usuario
+      if (user.rol === 1) {
+        navigate('/private/lock');
+      } else if (user.rol === 2 || user.rol === 3) {
+        navigate('/private/taller');
+      } else if (user.rol === 4) {
+        navigate('/private/estadisticas');
+      }
     } catch (error) {
       openNotificationWithIcon(notification, 'error', 'Verifica tu usuario y clave, si el error continúa contacta con el administrador.', '', 4);
     }
