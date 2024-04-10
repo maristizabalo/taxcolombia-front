@@ -1,20 +1,47 @@
-import React from 'react';
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
-const { Header, Content, Footer, Sider } = Layout;
-const items = [UserOutlined, VideoCameraOutlined, UploadOutlined, UserOutlined].map(
-  (icon, index) => ({
-    key: String(index + 1),
-    icon: React.createElement(icon),
-    label: `nav ${index + 1}`,
-  }),
-);
+import { Card, Col, Row, } from 'antd';
+import { carListService } from '../services/carService';
+import { useEffect, useState } from 'react';
+
 const HomePage = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+
+  const [car, setCar] = useState([])
+
+  useEffect(() => {
+    fetchCar();
+  }, []);
+  const fetchCar = async () => {
+    try {
+      const data = await carListService();
+      setCar(data);
+    } catch (error) {
+      console.error('Error fetching componentes', error);
+    }
+  };
   return (
-    <>HOLA</>
+    <div>
+      {car.map(c => (
+        <Card key={c.id} title={c.placa}>
+
+        </Card>
+      ))}
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>
+            Card content
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };
 export default HomePage;

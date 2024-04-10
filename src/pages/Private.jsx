@@ -1,42 +1,70 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AppLayout from '../components/AppLayout';
 import { useSelector } from 'react-redux';
 import { Loading } from '../components/Loading';
-import HomePage from './HomePage';
 import { Route, Routes } from 'react-router-dom';
+import TallerPage from './TallerPage';
+import InformePage from './InformePage';
+import AdministradorPage from './AdministradorPage';
+import NotasPage from './NotasPage';
+import PerfilPage from './PerfilPage';
+import EstadisticasPage from './EstadisticasPage';
+import LockPage from './LockPage';
 
 const Private = () => {
-
-    const userRole = useSelector((store) => store.userInfo.user.rol)
-
-    // Define un nuevo estado para manejar la carga de la autenticación
+    const userRole = useSelector((store) => store.userInfo.user.rol);
     const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
     useEffect(() => {
         if (userRole !== undefined) {
-            // Cuando el rol del usuario ya está disponible, actualiza el estado
             setIsAuthLoaded(true);
         }
     }, [userRole]);
 
-    // Si la autenticación aún no se ha cargado, renderiza un componente de carga
     if (!isAuthLoaded) {
         return <Loading />;
     }
 
-    console.log(userRole)
-    // Si la autenticación ya se ha cargado, renderiza las rutas como antes
+    // Definir las rutas disponibles según el rol del usuario
+    let routes;
+    if (userRole === 4) {
+        routes = (
+            <Route path="/estadisticas" element={<EstadisticasPage />} />
+        );
+    } else if (userRole === 1) {
+        routes = (
+            <Route path="/lock" element={<LockPage />} />
+        );
+    } else {
+        routes = (
+            <>
+                <Route path="/taller" element={<TallerPage />} />
+                <Route path="/informe" element={<InformePage />} />
+                <Route path="/administrador" element={<AdministradorPage />} />
+                <Route path="/perfil" element={<PerfilPage />} />
+                <Route path="/notas" element={<NotasPage />} />
+            </>
+        );
+    }
+
+    // Mostrar el AppLayout solo si el rol es 2 o 3
+    const showAppLayout = userRole === 2 || userRole === 3;
 
     return (
-        <AppLayout>
-            <Routes>
-                <Route path="/" element={<HomePage />} />
-                {/* <Route path="/taller" element={<TallerPage />} />
-                <Route path="/informe" element={<InformePage />} />
-                <Route path="/administrador" element={<AdministradorPage />} /> */}
-            </Routes>
-        </AppLayout>
-    )
+        <>
+            {showAppLayout ?
+                <AppLayout>
+                    <Routes>
+                        {routes}
+                    </Routes>
+                </AppLayout>
+                :
+                <Routes>
+                    {routes}
+                </Routes>
+            }
+        </>
+    );
 }
 
-export default Private
+export default Private;
