@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Instancia general
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_INVOTIC_API || "http://localhost:8000/api/",
+  baseURL: import.meta.env.VITE_TAXCOLOMBIA_API || "http://localhost:8000/api/",
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
