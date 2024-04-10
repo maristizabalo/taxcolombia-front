@@ -157,5 +157,14 @@ export const informeDetailService = async (fecha, placa) => {
     }
 };
 
+export const estadisticasService = async () => {
+    try {
+        const response = await api.get('mantenimiento/estadisticas/');
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+};
+
 
 
