@@ -59,8 +59,8 @@ const InformePage = () => {
     const today = new Date().toLocaleDateString('es-ES').split('/').reverse().join('-');
 
     const data = [
-      ["AÑO", "MES", "DIA", "NOVEDAD"],
-      ...informe.map(inform => [inform.AÑO, inform.MES, inform.DIA, inform.NOVEDAD])
+      ["AÑO", "MES", "DIA", "PLACA", "MOVIL","NOVEDAD"],
+      ...informe.map(inform => [inform.AÑO, inform.MES, inform.DIA, inform.PLACA, inform.MOVIL, inform.NOVEDAD])
     ];
 
     const wb = XLSX.utils.book_new();
