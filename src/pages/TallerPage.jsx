@@ -1,12 +1,13 @@
-import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, Tag, TimePicker, notification } from "antd"
+import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, Tag, TimePicker, notification, Space, Tooltip } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { carListService, createMantenimientoService, createMecanicoService, editMantenimientoService, mantenimientoActiveListService, mantenimientoListService, mecanicoListService, motivoListService } from '../services/carService';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ESTADO_MANTENIMIENTO, MOTIVO } from "../utils/const";
-import { CloseCircleOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, EditOutlined, CheckCircleOutlined, LeftCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { openNotificationWithIcon } from "../utils/notification";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import Highlighter from 'react-highlight-words';
 
 const colorMap = {
   1: 'gold', // EN PROCESO
@@ -27,10 +28,69 @@ const TallerPage = () => {
   const [filteredMantenimientos, setFilteredMantenimientos] = useState([]);
   const [idSalida, setIdSalida] = useState('')
   const [editingMantenimiento, setEditingMantenimiento] = useState(null);
+  const searchInput = useRef(null);
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
   const [formEntrada] = Form.useForm();
   const [formMecanico] = Form.useForm();
   const [formSalida] = Form.useForm();
   const userId = useSelector((store) => store.userInfo.user.user_id)
+
+
+  const getColumnSearchProps = (dataIndex, placeholder) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput}
+          placeholder={`Buscar ${placeholder}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Buscar
+          </Button>
+          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Restablecer
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value, record) => record[dataIndex]
+      ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+      : '',
+    render: text =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = clearFilters => {
+    clearFilters();
+    setSearchText('');
+  };
 
   const columns = [
     {
@@ -38,44 +98,53 @@ const TallerPage = () => {
       dataIndex: 'vehiculo_placa',
       key: 'placa',
       width: '5%',
+      ...getColumnSearchProps('vehiculo_placa', 'Placa'),
     },
     {
       title: 'Movil',
       dataIndex: 'vehiculo_movil',
       key: 'movil',
       width: '5%',
+      ...getColumnSearchProps('vehiculo_movil', 'Movil'),
     },
     {
       title: 'Motivo',
       dataIndex: 'motivo_nombre',
       key: 'motivo',
       width: '5%',
+      ...getColumnSearchProps('motivo_nombre', 'Motivo'),
     },
     {
       title: 'Observacion',
       dataIndex: 'observacion',
       key: 'observacion',
-      width: '15%',
+      width: '39%',
+    },
+    {
+      title: 'Observacion Salida',
+      dataIndex: 'observacion_salida',
+      key: 'observacion',
+      width: '39%',
     },
     {
       title: 'Ingreso',
       dataIndex: 'fecha_ingreso',
       key: 'fecha_ingreso',
-      width: '4%',
+      width: '8%',
       render: fecha_ingreso => moment(fecha_ingreso).format('YYYY-MM-DD h:mm A')
     },
     {
       title: 'Salida',
       dataIndex: 'fecha_salida',
       key: 'fecha_salida',
-      width: '4%',
+      width: '8%',
       render: fecha_salida => moment(fecha_salida).format('YYYY-MM-DD h:mm A')
     },
     {
       title: 'Registrado',
       dataIndex: 'hora_registro',
       key: 'hora_registro',
-      width: '4%',
+      width: '8%',
       render: hora_registro => moment(hora_registro).format('YYYY-MM-DD h:mm A')
     },
     {
@@ -83,18 +152,47 @@ const TallerPage = () => {
       dataIndex: 'autor_nombre',
       key: 'autor',
       width: '10%',
+      ...getColumnSearchProps('autor_nombre', 'Autor'),
     },
     {
       title: 'Estado',
       dataIndex: 'estado_mantenimiento',
       key: 'estado',
-      width: '5%',
+      width: '8%',
+      filters: [
+        { text: 'EN PROCESO', value: 1 },
+        { text: 'TERMINADO', value: 2 },
+        { text: 'CANCELADO', value: 3 }
+      ],
+      onFilter: (value, record) => record.estado_mantenimiento === value,
       render: estado => (
         <Tag color={colorMap[estado]}>
           {ESTADO_MANTENIMIENTO[estado]}
         </Tag>
       )
-    }
+    },
+    {
+      title: 'Accion',
+      key: 'accion',
+      width: '4%',
+      render: (text, record) => {
+        const fechaIngreso = new Date(record.fecha_ingreso);
+        const diferenciaTiempo = Date.now() - fechaIngreso.getTime();
+        const horasTranscurridas = diferenciaTiempo / (1000 * 60 * 60);
+        const botonVisible = horasTranscurridas < 1 && record.estado_mantenimiento === 2;
+        return (
+          <>
+            {botonVisible && (
+              <Tooltip title={'Devolver a taller'}>
+                <span key="editar" className="text-[#000000] font-bold hover:bg-gray-100" onClick={() => comeBackTaller(record)}>
+                  <LeftCircleOutlined className="text-lg mr-4" />
+                </span>
+              </Tooltip>
+            )}
+          </>
+        );
+      },
+    },
   ]
   useEffect(() => {
     if (tallerActual) {
@@ -154,6 +252,18 @@ const TallerPage = () => {
       const filtered = mantenimientos.filter(mantenimiento => mantenimiento.vehiculo_placa.toLowerCase().includes(value.toLowerCase()));
       setFilteredMantenimientos(filtered);
     }
+  };
+
+  const comeBackTaller = async (record) => {
+    const payload = {
+      fecha_salida: null,
+      observacion_salida: "",
+      realizado_por: "",
+      estado_mantenimiento: 1
+    };
+    await editMantenimientoService(record.id, payload);
+    openNotificationWithIcon(notification, 'success', 'Devuelto a taller exitosamente', '', 4)
+    fetchMantenimientos();
   };
 
   const openEditModal = (mantenimiento) => {
@@ -398,12 +508,9 @@ const TallerPage = () => {
             </div>
           </div>
           :
-          <Table columns={columns} dataSource={mantenimientos} size='small' />
+          <Table columns={columns} dataSource={mantenimientos} size='small' pagination={{ defaultPageSize: 100 }} />
         }
       </div>
-
-
-
 
       <Modal
         title={(<div className="text-2xl">{editingMantenimiento ? 'Editar entrada' : 'Agregar entrada'}</div>)}

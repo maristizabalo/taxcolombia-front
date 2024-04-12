@@ -162,7 +162,7 @@ const Vehiculos = () => {
                 dataSource={cars}
             />
             <Modal
-                title="Editar Usuario"
+                title="Editar Vehiculo"
                 open={carModalVisible}
                 onOk={onOkCar}
                 onCancel={onCancelCar}
