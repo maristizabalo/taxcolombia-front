@@ -3,7 +3,8 @@ export const ROLES = {
     VISITANTE: 1,
     ADMIN: 2,
     SUPERVISOR: 3,
-    GERENCIA: 4
+    GERENCIA: 4,
+    BARRIDO: 5
 }
 
 export const ROLES_TEXT = {

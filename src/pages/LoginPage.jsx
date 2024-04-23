@@ -43,6 +43,8 @@ const Login = () => {
         navigate('/private/taller');
       } else if (user.rol === ROLES.GERENCIA) {
         navigate('/private/estadisticas');
+      } else if (user.rol === ROLES.BARRIDO) {
+        navigate('/private/barrido');
       }
     } catch (error) {
       openNotificationWithIcon(notification, 'error', 'Verifica tu usuario y clave, si el error continúa contacta con el administrador.', '', 4);

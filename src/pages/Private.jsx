@@ -10,6 +10,8 @@ import NotasPage from './NotasPage';
 import PerfilPage from './PerfilPage';
 import EstadisticasPage from './EstadisticasPage';
 import LockPage from './LockPage';
+import { ROLES } from '../utils/const';
+import BarridoPage from './BarridoPage';
 
 const Private = () => {
     const userRole = useSelector((store) => store.userInfo.user.rol);
@@ -27,13 +29,17 @@ const Private = () => {
 
     // Definir las rutas disponibles según el rol del usuario
     let routes;
-    if (userRole === 4) {
+    if (userRole === ROLES.GERENCIA) {
         routes = (
             <Route path="/estadisticas" element={<EstadisticasPage />} />
         );
-    } else if (userRole === 1) {
+    } else if (userRole === ROLES.VISITANTE) {
         routes = (
             <Route path="/lock" element={<LockPage />} />
+        );
+    } else if (userRole === ROLES.BARRIDO) {
+        routes = (
+            <Route path="/barrido" element={<BarridoPage />} />
         );
     } else {
         routes = (
@@ -48,7 +54,7 @@ const Private = () => {
     }
 
     // Mostrar el AppLayout solo si el rol es 2 o 3
-    const showAppLayout = userRole === 2 || userRole === 3;
+    const showAppLayout = userRole === ROLES.ADMIN || userRole === ROLES.SUPERVISOR;
 
     return (
         <>
