@@ -4,13 +4,16 @@ import { resetUser } from '../redux/states/user';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { openNotificationWithIcon } from '../utils/notification';
-import { carListService } from '../services/carService';
+import { carListService, carsByEstadoService, estadoInternoActiveListService } from '../services/carService';
 import { Select } from 'antd';
 
 const { Option } = Select;
 
-const Sweeper = () => {
+const BarridoPage = () => {
   const [cars, setCars] = useState([]);
+  const [carsByEstado, setCarsByEstado] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(1);
+  const [estados, setEstados] = useState([]);
   const [vehicles, setVehicles] = useState({
     BodegaPorConductor: [],
     BodegaRionegro: [],
@@ -43,33 +46,53 @@ const Sweeper = () => {
     }
   };
 
+  const fetchEstadosInternos = async () => {
+    try {
+      const data = await estadoInternoActiveListService();
+      setEstados(data);
+      console.log(data)
+    } catch (error) {
+      console.error('Error fetching componentes', error);
+    }
+  };
+
+  const fetchCarsByEstado = async (estado) => {
+    try {
+      const data = await carsByEstadoService(estado);
+      setCarsByEstado(data);
+      console.log(data)
+    } catch (error) {
+      console.error('Error fetching componentes', error);
+    }
+  };
+
   useEffect(() => {
     fetchCars();
-  }, []);
+    fetchEstadosInternos();
+    fetchCarsByEstado(selectedCategory.id);
+  }, [selectedCategory]);
 
-  const [selectedCategory, setSelectedCategory] = useState('BodegaPorConductor');
-  const [newVehicle, setNewVehicle] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPlateIndex, setSelectedPlateIndex] = useState(null);
+  
+  // const [newVehicle, setNewVehicle] = useState('');
+  // const [showModal, setShowModal] = useState(false);
+  // const [selectedPlateIndex, setSelectedPlateIndex] = useState(null);
 
-  const handleAddVehicle = () => {
-    setVehicles(prevState => ({
-      ...prevState,
-      [selectedCategory]: [...prevState[selectedCategory], newVehicle]
-    }));
-    setNewVehicle('');
-  };
+  // const handleAddVehicle = () => {
+  //   setVehicles(prevState => ({
+  //     ...prevState,
+  //     [selectedCategory]: [...prevState[selectedCategory], newVehicle]
+  //   }));
+  //   setNewVehicle('');
+  // };
 
-  const handleDeleteVehicle = () => {
-    const updatedList = vehicles[selectedCategory].filter((_, index) => index !== selectedPlateIndex);
-    setVehicles(prevState => ({
-      ...prevState,
-      [selectedCategory]: updatedList
-    }));
-    setShowModal(false);
-  };
-
-  console.log(vehicles[selectedCategory])
+  // const handleDeleteVehicle = () => {
+  //   const updatedList = vehicles[selectedCategory].filter((_, index) => index !== selectedPlateIndex);
+  //   setVehicles(prevState => ({
+  //     ...prevState,
+  //     [selectedCategory]: updatedList
+  //   }));
+  //   setShowModal(false);
+  // };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -77,29 +100,7 @@ const Sweeper = () => {
         <h1 className="text-3xl font-bold text-center mb-4">Barrido</h1>
         <LogoutOutlined className='text-2xl ml-auto' onClick={() => exit()} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.keys(vehicles[selectedCategory]).map((plate, index) => (
-          <div key={index} className="bg-gray-200 p-4 rounded-md">
-            <h2 className="text-xl font-semibold mb-2">{plate}</h2>
-            <ul>
-              {vehicles[selectedCategory].map((vehicle, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>{vehicle}</span>
-                  <button
-                    className="text-red-500"
-                    onClick={() => {
-                      setSelectedPlateIndex(index);
-                      setShowModal(true);
-                    }}
-                  >
-                    x
-                  </button>
-                </li>
-              ))}
-            </ul>
-
-          </div>
-        ))}
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Select
           showSearch
           placeholder="Selecciona un vehículo"
@@ -141,50 +142,25 @@ const Sweeper = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
+      <div>
+        <div className='font-bold'>
+          {selectedCategory.nombre}
+        </div>
+      </div>
       <div className="fixed bottom-0 left-0 right-0 bg-white shadow-md">
         <div className="container mx-auto px-4 py-2">
           <div className="flex flex-wrap justify-between">
-            <div className="w-1/2 md:w-auto mb-2 md:mb-0">
-              <button
-                className={`w-full py-2 text-gray-600 focus:outline-none rounded-md ${selectedCategory === 'BodegaPorConductor' ? 'bg-blue-400 text-white' : ''}`}
-                onClick={() => setSelectedCategory('BodegaPorConductor')}
-              >
-                Bodega
-              </button>
-            </div>
-            <div className="w-1/2 md:w-auto mb-2 md:mb-0">
-              <button
-                className={`w-full py-2 text-gray-600 focus:outline-none rounded-md ${selectedCategory === 'BodegaRionegro' ? 'bg-blue-400 text-white' : ''}`}
-                onClick={() => setSelectedCategory('BodegaRionegro')}
-              >
-                Rionegro
-              </button>
-            </div>
-            <div className="w-1/3 md:w-auto mb-2 md:mb-0">
-              <button
-                className={`w-full py-2 text-gray-600 focus:outline-none rounded-md ${selectedCategory === 'Chatarrizacion' ? 'bg-blue-400 text-white' : ''}`}
-                onClick={() => setSelectedCategory('Chatarrizacion')}
-              >
-                Chatarrización
-              </button>
-            </div>
-            <div className="w-1/3 md:w-auto mb-2 md:mb-0">
-              <button
-                className={`w-full py-2 text-gray-600 focus:outline-none rounded-md ${selectedCategory === 'Cartagena' ? 'bg-blue-400 text-white' : ''}`}
-                onClick={() => setSelectedCategory('Cartagena')}
-              >
-                Cartagena
-              </button>
-            </div>
-            <div className="w-1/3 md:w-auto mb-2 md:mb-0">
-              <button
-                className={`w-full py-2 text-gray-600 focus:outline-none rounded-md ${selectedCategory === 'Vitrina' ? 'bg-blue-400 text-white' : ''}`}
-                onClick={() => setSelectedCategory('Vitrina')}
-              >
-                Vitrina
-              </button>
-            </div>
+            {estados.map((estado) => (
+              <div className="w-1/2 md:w-auto mb-2 md:mb-0">
+                <button
+                  className={`w-full py-2 text-gray-600 text-[10px] border-blue-400 border-2 focus:outline-none rounded-md ${selectedCategory.id === estado.id ? 'bg-blue-400 text-white' : ''}`}
+                  onClick={() => setSelectedCategory(estado)}
+                >
+                  {estado.nombre_corto}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -192,4 +168,4 @@ const Sweeper = () => {
   );
 };
 
-export default Sweeper;
+export default BarridoPage;

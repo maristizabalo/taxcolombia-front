@@ -9,6 +9,19 @@ export const carListService = async () => {
     }
 };
 
+export const carsByEstadoService = async (estado) => {
+    try {
+        const payload = {
+            estado: estado
+        }
+        const response = await api.post(`car/estado/`, payload )
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+};
+
+
 export const carAllListService = async () => {
     try {
         const response = await api.get('car/all');
@@ -166,5 +179,13 @@ export const estadisticasService = async () => {
     }
 };
 
+export const estadoInternoActiveListService = async () => {
+    try {
+        const response = await api.get('car/estado-interno/');
+        return response.data;
+    } catch (error) {
+        console.error(error)
+    }
+};
 
 
