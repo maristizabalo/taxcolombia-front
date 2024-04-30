@@ -1,6 +1,6 @@
 import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, Tag, TimePicker, notification, Space, Tooltip } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { carListService, createMantenimientoService, createMecanicoService, editMantenimientoService, mantenimientoActiveListService, mantenimientoListService, mecanicoListService, motivoListService } from '../services/carService';
+import { carListService, createMantenimientoService, createMecanicoService, editCarService, editMantenimientoService, mantenimientoActiveListService, mantenimientoListService, mecanicoListService, motivoListService } from '../services/carService';
 import { useEffect, useRef, useState } from 'react';
 import { ESTADO_MANTENIMIENTO, MOTIVO } from "../utils/const";
 import { CloseCircleOutlined, EditOutlined, CheckCircleOutlined, LeftCircleOutlined, SearchOutlined } from '@ant-design/icons';
@@ -27,6 +27,7 @@ const TallerPage = () => {
   const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false);
   const [filteredMantenimientos, setFilteredMantenimientos] = useState([]);
   const [idSalida, setIdSalida] = useState('')
+  const [idCarSalida, setIdCarSalida] = useState('')
   const [editingMantenimiento, setEditingMantenimiento] = useState(null);
   const searchInput = useRef(null);
   const [searchText, setSearchText] = useState('');
@@ -303,12 +304,17 @@ const TallerPage = () => {
           } else {
             // Si no hay un mantenimiento en edición, se crea uno nuevo
             await createMantenimientoService(payload);
+            const idCar = formEntrada.getFieldValue('vehiculo')
+            const payloadStateCar = {
+              estado_interno: 8
+            };
+            await editCarService(idCar, payloadStateCar);
             openNotificationWithIcon(notification, 'success', 'Entrada a taller registrada exitosamente', '', 4);
           }
           setEntradaModalVisible(false);
           fetchMantenimientosActivos();
           formEntrada.resetFields();
-          setEditingMantenimiento(null); // Limpiar el mantenimiento en edición
+          setEditingMantenimiento(null);
         })
         .catch((error) => {
           console.error('Error en la validación del formulario:', error);
@@ -363,11 +369,16 @@ const TallerPage = () => {
             estado_mantenimiento: 2
           };
           await editMantenimientoService(idSalida, payload);
+          const payloadStateCar = {
+            estado_interno: 7
+          };
+          await editCarService(idCarSalida, payloadStateCar);
           openNotificationWithIcon(notification, 'success', 'Salida de taller registrada correctamente.', '', 4)
           setSalidaModalVisible(false);
           fetchMantenimientosActivos();
           formSalida.resetFields()
           setIdSalida('')
+          setIdCarSalida('')
         })
         .catch((error) => {
           openNotificationWithIcon(notification, 'error', 'Por favor complete todos los campos requeridos', '', 4);
@@ -381,27 +392,35 @@ const TallerPage = () => {
 
   const modalSalida = (record) => {
     setSalidaModalVisible(true)
-    setIdSalida(record)
+    setIdSalida(record.id)
+    setIdCarSalida(record.vehiculo)
   }
 
   const modalEliminar = (record) => {
     setConfirmDeleteModalVisible(true)
-    setIdSalida(record)
+    setIdSalida(record.id)
+    setIdCarSalida(record.vehiculo)
   }
 
   const handleCancelSalida = () => {
     setSalidaModalVisible(false)
     formSalida.resetFields()
     setIdSalida('')
+    setIdCarSalida('')
   }
 
   const handleDeleteConfirm = async () => {
     try {
       await editMantenimientoService(idSalida, { estado_mantenimiento: 3 });
+      const payloadStateCar = {
+        estado_interno: 7
+      };
+      await editCarService(idCarSalida, payloadStateCar);
       openNotificationWithIcon(notification, 'success', 'Entrada al taller cancelada exitosamente', '', 4);
       setConfirmDeleteModalVisible(false);
       fetchMantenimientosActivos(); // Actualiza la lista de mantenimientos
       setIdSalida('')
+      setIdCarSalida('')
     } catch (error) {
       console.error('Error al cancelar la entrada al taller', error);
       openNotificationWithIcon(notification, 'error', 'Error al cancelar la entrada al taller', '', 4);
@@ -480,10 +499,10 @@ const TallerPage = () => {
                         <span key="editar" className="text-[#000000] font-bold hover:bg-gray-100" onClick={() => openEditModal(mantenimiento)}>
                           <EditOutlined className="text-lg mr-1" /> Editar
                         </span>,
-                        <span key="salida" className="text-[#42bff2] font-bold hover:bg-gray-100" onClick={() => modalSalida(mantenimiento.id)}>
+                        <span key="salida" className="text-[#42bff2] font-bold hover:bg-gray-100" onClick={() => modalSalida(mantenimiento)}>
                           <CheckCircleOutlined className="text-lg mr-1" /> Salida
                         </span>,
-                        <span key="eliminar" className="text-[#d44a80] font-bold hover:bg-gray-100" onClick={() => modalEliminar(mantenimiento.id)}>
+                        <span key="eliminar" className="text-[#d44a80] font-bold hover:bg-gray-100" onClick={() => modalEliminar(mantenimiento)}>
                           <CloseCircleOutlined className="text-lg mr-1" /> Eliminar
                         </span>,
                       ]}
