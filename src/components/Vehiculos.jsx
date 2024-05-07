@@ -40,7 +40,7 @@ const Vehiculos = () => {
             width: '5%',
         },
         {
-            title: 'Estado',
+            title: 'Activo/Inactivo',
             dataIndex: 'is_active',
             key: 'estado',
             render: is_active => (
@@ -48,6 +48,12 @@ const Vehiculos = () => {
                     {is_active ? 'Activo' : 'Inactivo'}
                 </Tag>
             ),
+            width: '5%',
+        },
+        {
+            title: 'Estado',
+            dataIndex: 'estado_interno_nombre',
+            key: 'estado_interno',
             width: '5%',
         },
         {
