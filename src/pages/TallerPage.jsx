@@ -1,9 +1,9 @@
-import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, Tag, TimePicker, notification, Space, Tooltip } from "antd"
+import { Button, Card, Col, Form, Input, Modal, Row, Select, Table, Tag, TimePicker, notification, Space, Tooltip, Spin } from "antd"
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { carListService, createMantenimientoService, createMecanicoService, editCarService, editMantenimientoService, mantenimientoActiveListService, mantenimientoListService, mecanicoListService, motivoListService } from '../services/carService';
 import { useEffect, useRef, useState } from 'react';
 import { ESTADO_MANTENIMIENTO, MOTIVO } from "../utils/const";
-import { CloseCircleOutlined, EditOutlined, CheckCircleOutlined, LeftCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, EditOutlined, CheckCircleOutlined, LeftCircleOutlined, SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import { openNotificationWithIcon } from "../utils/notification";
 import { useSelector } from "react-redux";
 import moment from "moment";
@@ -35,6 +35,7 @@ const TallerPage = () => {
   const [formEntrada] = Form.useForm();
   const [formMecanico] = Form.useForm();
   const [formSalida] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const userId = useSelector((store) => store.userInfo.user.user_id)
 
 
@@ -177,8 +178,8 @@ const TallerPage = () => {
       key: 'accion',
       width: '4%',
       render: (text, record) => {
-        const fechaIngreso = new Date(record.fecha_ingreso);
-        const diferenciaTiempo = Date.now() - fechaIngreso.getTime();
+        const fechaSalida = new Date(record.fecha_salida);
+        const diferenciaTiempo = Date.now() - fechaSalida.getTime();
         const horasTranscurridas = diferenciaTiempo / (1000 * 60 * 60);
         const botonVisible = horasTranscurridas < 1 && record.estado_mantenimiento === 2;
         return (
@@ -208,9 +209,11 @@ const TallerPage = () => {
 
   const fetchMantenimientosActivos = async () => {
     try {
+      setLoading(true)
       const data = await mantenimientoActiveListService();
       setMantenimientos(data);
       setFilteredMantenimientos(data);
+      setLoading(false)
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -218,8 +221,10 @@ const TallerPage = () => {
 
   const fetchMantenimientos = async () => {
     try {
+      setLoading(true)
       const data = await mantenimientoListService();
       setMantenimientos(data);
+      setLoading(false)
     } catch (error) {
       console.error('Error fetching componentes', error);
     }
@@ -448,86 +453,95 @@ const TallerPage = () => {
         </Button>
       </div>
       <div className="content-container mt-4 p-6">
-        {tallerActual ?
-          <div>
-            <div className="flex py-4">
-              <Input
-                placeholder="Buscar placa en taller..."
-                allowClear
-                onChange={(e) => handlePlacaChange(e.target.value)}
-                size="large"
-              />
-              <Button
-                size="large"
-                shape="round"
-                className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
-                onClick={() => setEntradaModalVisible(true)}>
-                <PlusCircleOutlined className="mr-2" />
-                Agregar entrada
-              </Button>
-              <Button
-                size="large"
-                shape="round"
-                className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
-                onClick={() => setMecanicoModalVisible(true)}>
-                <PlusCircleOutlined className="mr-2" />
-                Agregar mecanico
-              </Button>
+        {
+
+          loading ?
+            <div className="flex justify-center items-center h-full">
+              <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
             </div>
+            :
 
 
-            <div className="flex flex-wrap">
-              {filteredMantenimientos
-                .sort((a, b) => b.id - a.id) // Ordenar los elementos de manera descendente por el ID
-                .map((mantenimiento) => (
-                  <div key={mantenimiento.id} className="w-1/3 mb-4 px-7">
-                    <Card
-                      className="hover:border-l-{fuchsia-700}"
-                      title={(<>
-                        <div>
-                          {mantenimiento.vehiculo_placa} - {mantenimiento.vehiculo_movil}
-                        </div>
-                        <div>
-                          {MOTIVO[mantenimiento.motivo]}
+            tallerActual ?
+              <div>
+                <div className="flex py-4">
+                  <Input
+                    placeholder="Buscar placa en taller..."
+                    allowClear
+                    onChange={(e) => handlePlacaChange(e.target.value)}
+                    size="large"
+                  />
+                  <Button
+                    size="large"
+                    shape="round"
+                    className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
+                    onClick={() => setEntradaModalVisible(true)}>
+                    <PlusCircleOutlined className="mr-2" />
+                    Agregar entrada
+                  </Button>
+                  <Button
+                    size="large"
+                    shape="round"
+                    className="btn bg-[#42BFF2] text-white hover:bg-pink-500 px-4 py-2 flex items-center ml-4"
+                    onClick={() => setMecanicoModalVisible(true)}>
+                    <PlusCircleOutlined className="mr-2" />
+                    Agregar mecanico
+                  </Button>
+                </div>
 
-                        </div>
-                      </>)}
-                      style={{
-                        backgroundColor: mantenimiento.motivo === 1 ? '#FFF7E6' : mantenimiento.motivo === 2 ? '#FFE6E6' : '',
-                      }}
-                      actions={[
-                        <span key="editar" className="text-[#000000] font-bold hover:bg-gray-100" onClick={() => openEditModal(mantenimiento)}>
-                          <EditOutlined className="text-lg mr-1" /> Editar
-                        </span>,
-                        <span key="salida" className="text-[#42bff2] font-bold hover:bg-gray-100" onClick={() => modalSalida(mantenimiento)}>
-                          <CheckCircleOutlined className="text-lg mr-1" /> Salida
-                        </span>,
-                        <span key="eliminar" className="text-[#d44a80] font-bold hover:bg-gray-100" onClick={() => modalEliminar(mantenimiento)}>
-                          <CloseCircleOutlined className="text-lg mr-1" /> Eliminar
-                        </span>,
-                      ]}
-                    >
-                      {mantenimiento.observacion && <div><p className="font-bold">Observación:</p> {mantenimiento.observacion}</div>}
-                      {mantenimiento.fecha_ingreso && <div><p className="font-bold">Fecha de ingreso:</p>
-                        {
-                          new Date(mantenimiento.fecha_ingreso).toLocaleString('es-es', {
-                            weekday: "long",
-                            month: "long",
-                            day: "numeric",
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            hour12: true
-                          })
-                        }
-                      </div>}
-                    </Card>
-                  </div>
 
-                ))}
-            </div>
-          </div>
-          :
-          <Table columns={columns} dataSource={mantenimientos} size='small' pagination={{ defaultPageSize: 100 }} />
+                <div className="flex flex-wrap">
+                  {filteredMantenimientos
+                    .sort((a, b) => b.id - a.id) // Ordenar los elementos de manera descendente por el ID
+                    .map((mantenimiento) => (
+                      <div key={mantenimiento.id} className="w-1/3 mb-4 px-7">
+                        <Card
+                          className="hover:border-l-{fuchsia-700}"
+                          title={(<>
+                            <div>
+                              {mantenimiento.vehiculo_placa} - {mantenimiento.vehiculo_movil}
+                            </div>
+                            <div>
+                              {MOTIVO[mantenimiento.motivo]}
+
+                            </div>
+                          </>)}
+                          style={{
+                            backgroundColor: mantenimiento.motivo === 1 ? '#FFF7E6' : mantenimiento.motivo === 2 ? '#FFE6E6' : '',
+                          }}
+                          actions={[
+                            <span key="editar" className="text-[#000000] font-bold hover:bg-gray-100" onClick={() => openEditModal(mantenimiento)}>
+                              <EditOutlined className="text-lg mr-1" /> Editar
+                            </span>,
+                            <span key="salida" className="text-[#42bff2] font-bold hover:bg-gray-100" onClick={() => modalSalida(mantenimiento)}>
+                              <CheckCircleOutlined className="text-lg mr-1" /> Salida
+                            </span>,
+                            <span key="eliminar" className="text-[#d44a80] font-bold hover:bg-gray-100" onClick={() => modalEliminar(mantenimiento)}>
+                              <CloseCircleOutlined className="text-lg mr-1" /> Eliminar
+                            </span>,
+                          ]}
+                        >
+                          {mantenimiento.observacion && <div><p className="font-bold">Observación:</p> {mantenimiento.observacion}</div>}
+                          {mantenimiento.fecha_ingreso && <div><p className="font-bold">Fecha de ingreso:</p>
+                            {
+                              new Date(mantenimiento.fecha_ingreso).toLocaleString('es-es', {
+                                weekday: "long",
+                                month: "long",
+                                day: "numeric",
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                              })
+                            }
+                          </div>}
+                        </Card>
+                      </div>
+
+                    ))}
+                </div>
+              </div>
+              :
+              <Table columns={columns} dataSource={mantenimientos} size='small' pagination={{ defaultPageSize: 100 }} />
         }
       </div>
 
