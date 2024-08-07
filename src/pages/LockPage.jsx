@@ -1,4 +1,3 @@
-import React from 'react';
 import { LockOutlined } from '@ant-design/icons';
 import Logout from '../components/Logout';
 

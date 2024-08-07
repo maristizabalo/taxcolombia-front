@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import store from './redux/store'
 import Private from './pages/Private'
 import esES from 'antd/locale/es_ES'
+import HomePage from './pages/HomePage'
 
 const App = () => {
   return (
@@ -23,7 +24,7 @@ const App = () => {
             <Route element={<PrivateRoute />} >
               <Route path='/private/*' element={<Private />} />
             </Route>
-            <Route exact path='/' element={<LoginPage />} />
+            <Route exact path='/' element={<HomePage />} />
           </Routes>
         </Router>
       </Provider>
