@@ -1,14 +1,31 @@
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
 import logo from "../assets/invertaxi_logo.png";
 import { navItems } from "../constants";
 import { Link } from "react-router-dom";
+import { useState, useRef } from "react";
 
 const Navbar = () => {
     const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
     const toggleNavbar = () => {
         setMobileDrawerOpen(!mobileDrawerOpen);
+    };
+
+    const sections = {
+        inicio: useRef(null),
+        servicios: useRef(null),
+        contacto: useRef(null),
+    };
+
+    const scrollToSection = (section) => {
+        const sectionElement = sections[section]?.current;
+        if (sectionElement) {
+            sectionElement.scrollIntoView({ behavior: "auto"});
+            window.scrollBy({ top: -600t , behavior: "instant" }); // Ajusta -100 según el espacio que desees
+        } else {
+            console.error(`No se pudo encontrar la sección: ${section}`);
+        }
+        setMobileDrawerOpen(false); // Cerrar el drawer móvil
     };
 
     return (
@@ -21,22 +38,21 @@ const Navbar = () => {
                     <ul className="hidden lg:flex ml-14 space-x-12">
                         {navItems.map((item, index) => (
                             <li key={index}>
-                                <a href={item.href}>{item.label}</a>
+                                <a
+                                    href={`#${item.href}`}
+                                    onClick={() => scrollToSection(item.href.substring(1))}
+                                >
+                                    {item.label}
+                                </a>
                             </li>
                         ))}
                     </ul>
                     <div className="hidden lg:flex justify-center space-x-12 items-center">
-                        {/* <a href="#" className="py-2 px-3 border rounded-md">
-              Sign In
-            </a> */}
                         <Link to="/login">
-                            <a
-                                className="bg-gradient-to-r from-yellow-700 to-[#1b5d3c] py-2 px-3 rounded-md"
-                            >
+                            <a className="bg-gradient-to-r from-yellow-700 to-[#1b5d3c] py-2 px-3 rounded-md">
                                 Iniciar Sesión
                             </a>
                         </Link>
-
                     </div>
                     <div className="lg:hidden md:flex flex-col justify-end">
                         <button onClick={toggleNavbar}>
@@ -49,18 +65,21 @@ const Navbar = () => {
                         <ul>
                             {navItems.map((item, index) => (
                                 <li key={index} className="py-4">
-                                    <a href={item.href}>{item.label}</a>
+                                    <a
+                                        href={`#${item.href}`}
+                                        onClick={() => scrollToSection(item.href.substring(1))}
+                                    >
+                                        {item.label}
+                                    </a>
                                 </li>
                             ))}
                         </ul>
                         <div className="flex space-x-6">
-                        <Link to="/login">
-                            <a
-                                className="py-2 px-3 rounded-md bg-gradient-to-r from-yellow-700 to-[#1b5d3c]"
-                            >
-                                Iniciar Sesión
-                            </a>
-                        </Link>
+                            <Link to="/login">
+                                <a className="py-2 px-3 rounded-md bg-gradient-to-r from-yellow-700 to-[#1b5d3c]">
+                                    Iniciar Sesión
+                                </a>
+                            </Link>
                         </div>
                     </div>
                 )}

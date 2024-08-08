@@ -1,8 +1,9 @@
 import { features } from "../constants";
+import { forwardRef } from "react";
 
-const FeatureSection = () => {
+const FeatureSection = forwardRef((props, ref) => {
   return (
-    <div className="relative mt-20 border-b border-neutral-800 min-h-[800px]">
+    <div ref={ref} id="servicios" className="relative mt-20 border-b border-neutral-800 min-h-[800px]">
       <div className="text-center">
         <h2 className="text-3xl sm:text-5xl lg:text-6xl mt-10 lg:mt-20 tracking-wide">
           Descubre los{" "}
@@ -30,6 +31,6 @@ const FeatureSection = () => {
       </div>
     </div>
   );
-};
+});
 
 export default FeatureSection;

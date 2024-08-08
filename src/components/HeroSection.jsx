@@ -1,7 +1,8 @@
+import { forwardRef } from "react";
 
-const HeroSection = () => {
+const HeroSection = forwardRef((props, ref) => {
   return (
-    <div className="flex flex-col items-center mt-6 lg:mt-20 border-b border-neutral-800">
+    <div ref={ref} id="inicio" className="flex flex-col items-center mt-6 lg:mt-20 border-b border-neutral-800">
       <h1 className="text-4xl sm:text-6xl lg:text-7xl text-center tracking-wide">
         Bienvenido a
         <span className="bg-gradient-to-r from-yellow-700 to-[#1b5d3c] text-transparent bg-clip-text">
@@ -45,6 +46,6 @@ const HeroSection = () => {
       </div> */}
     </div>
   );
-};
+});
 
 export default HeroSection;
