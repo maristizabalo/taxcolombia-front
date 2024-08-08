@@ -5,11 +5,29 @@
 @tailwind utilities;
 
 :root {
-  font-family:"Poppins", sans-serif;
+  font-family: "Poppins", sans-serif;
   color-scheme: dark;
 }
 
 .content-container {
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background: linear-gradient(to right, #922b6d, #1b5d3c);
   }
+
+  50% {
+    background: linear-gradient(to right, #f8a1ed, #1b5d3c);
+  }
+
+  100% {
+    background: linear-gradient(to right, #922b6d, #1b5d3c);
+  }
+}
+
+.gradient-animation {
+  animation: gradientAnimation 5s infinite;
+}

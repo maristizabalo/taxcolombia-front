@@ -1,9 +1,4 @@
-import { BotMessageSquare } from "lucide-react";
-import { BatteryCharging } from "lucide-react";
-import { Fingerprint } from "lucide-react";
-import { ShieldHalf } from "lucide-react";
-import { PlugZap } from "lucide-react";
-import { GlobeLock } from "lucide-react";
+import { Car, CheckSquare, UserCheck, Monitor, HelpCircle, Wrench } from "lucide-react";
 
 import user1 from "../assets/profile-pictures/user1.jpg";
 import user2 from "../assets/profile-pictures/user2.jpg";
@@ -13,10 +8,9 @@ import user5 from "../assets/profile-pictures/user5.jpg";
 import user6 from "../assets/profile-pictures/user6.jpg";
 
 export const navItems = [
-  { label: "Features", href: "#" },
-  { label: "Workflow", href: "#" },
-  { label: "Pricing", href: "#" },
-  { label: "Testimonials", href: "#" },
+  { label: "Inicio", href: "#" },
+  { label: "Servicios", href: "#" },
+  { label: "Contacto", href: "#" }
 ];
 
 export const testimonials = [
@@ -60,63 +54,71 @@ export const testimonials = [
 
 export const features = [
   {
-    icon: <BotMessageSquare />,
-    text: "Drag-and-Drop Interface",
+    icon: <Car />,
+    text: "Vehículos en Óptimas Condiciones",
     description:
-      "Easily design and arrange your VR environments with a user-friendly drag-and-drop interface.",
+      "Invertaxi se encarga de mantener los vehículos en las mejores condiciones posibles, realizando mantenimiento preventivo y correctivo, incluyendo tapicería, latonería, pintura, llantas, alineación, balanceo, cambio de aceite y más.",
   },
   {
-    icon: <Fingerprint />,
-    text: "Multi-Platform Compatibility",
+    icon: <Wrench />,
+    text: "Mantenimiento Preventivo y Correctivo",
     description:
-      "Build VR applications that run seamlessly across multiple platforms, including mobile, desktop, and VR headsets.",
+      "Nuestro taller está preparado para cualquier eventualidad que pueda presentarse con los vehículos, asegurando que siempre estén listos para operar de manera eficiente.",
   },
   {
-    icon: <ShieldHalf />,
-    text: "Built-in Templates",
+    icon: <CheckSquare />,
+    text: "Beneficios por Cumplimiento",
     description:
-      "Jumpstart your VR projects with a variety of built-in templates for different types of applications and environments.",
+      "Los conductores que cumplen con sus cuotas reciben beneficios adicionales en la empresa, incentivando la puntualidad y el compromiso.",
   },
   {
-    icon: <BatteryCharging />,
-    text: "Real-Time Preview",
+    icon: <UserCheck />,
+    text: "Proceso de Selección de Conductores",
     description:
-      "Preview your VR application in real-time as you make changes, allowing for quick iterations and adjustments.",
+      "Invertaxi realiza pruebas de conocimiento del área de Bogotá y de conducción para asegurar que los conductores estén bien preparados. Los postulantes deben presentar una hoja de vida, fotocopia del pase de conducción y otros documentos requeridos.",
   },
   {
-    icon: <PlugZap />,
-    text: "Collaboration Tools",
+    icon: <Monitor />,
+    text: "Monitorización 24/7",
     description:
-      "Work together with your team in real-time on VR projects, enabling seamless collaboration and idea sharing.",
+      "Nuestros vehículos están equipados con sistemas de monitoreo en tiempo real para garantizar la seguridad y el seguimiento constante de las operaciones.",
   },
   {
-    icon: <GlobeLock />,
-    text: "Analytics Dashboard",
+    icon: <HelpCircle />,
+    text: "Soporte al Conductor",
     description:
-      "Gain valuable insights into user interactions and behavior within your VR applications with an integrated analytics dashboard.",
+      "Invertaxi ofrece soporte continuo a sus conductores, asegurando que siempre tengan acceso a ayuda y asistencia cuando lo necesiten.",
   },
 ];
 
 export const checklistItems = [
   {
-    title: "Code merge made easy",
-    description:
-      "Track the performance of your VR apps and gain insights into user behavior.",
+    title: "Descuentos del 35%",
+    description: "Obtén un 35% de descuento en domingos y festivos.",
   },
   {
-    title: "Review code without worry",
-    description:
-      "Track the performance of your VR apps and gain insights into user behavior.",
+    title: "1er Domingo del Mes Gratis",
+    description: "Disfruta de un primer domingo del mes sin costo.",
   },
   {
-    title: "AI Assistance to reduce time",
-    description:
-      "Track the performance of your VR apps and gain insights into user behavior.",
+    title: "Premios por Cumplimiento",
+    description: "Gana premios adicionales por cumplir con las cuotas establecidas.",
   },
   {
-    title: "Share work in minutes",
-    description:
-      "Track the performance of your VR apps and gain insights into user behavior.",
+    title: "Servicio de Taller y Mantenimiento",
+    description: "Accede a nuestro servicio de taller para el mantenimiento preventivo y correctivo de tu vehículo.",
+  },
+  {
+    title: "Mototaller",
+    description: "Contamos con un mototaller para reparaciones rápidas y eficientes.",
+  },
+  {
+    title: "Planilla de Viaje 24 Horas",
+    description: "Benefíciate de una planilla de viaje disponible las 24 horas.",
+  },
+  {
+    title: "Comunidad",
+    description: "Forma parte de nuestra comunidad de conductores y aprovecha los beneficios y apoyo continuo.",
   },
 ];
 

@@ -25,6 +25,7 @@ const App = () => {
               <Route path='/private/*' element={<Private />} />
             </Route>
             <Route exact path='/' element={<HomePage />} />
+            <Route exact path='/login' element={<LoginPage />} />
           </Routes>
         </Router>
       </Provider>
