@@ -1,47 +1,24 @@
-import { Card, Col, Row, } from 'antd';
-import { carListService } from '../services/carService';
-import { useEffect, useState } from 'react';
+import ContactSection from "../components/ContactSection";
+import FeatureSection from "../components/FeatureSection";
+import Footer from "../components/Footer";
+import HeroSection from "../components/HeroSection";
+import Navbar from "../components/Navbar";
+import Workflow from "../components/Workflow";
 
 const HomePage = () => {
 
-  const [car, setCar] = useState([])
-
-  useEffect(() => {
-    fetchCar();
-  }, []);
-  const fetchCar = async () => {
-    try {
-      const data = await carListService();
-      setCar(data);
-    } catch (error) {
-      console.error('Error fetching componentes', error);
-    }
-  };
   return (
-    <div>
-      {car.map(c => (
-        <Card key={c.id} title={c.placa}>
-
-        </Card>
-      ))}
-      <Row gutter={16}>
-        <Col span={8}>
-          <Card title="Card title" bordered={false}>
-            Card content
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card title="Card title" bordered={false}>
-            Card content
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card title="Card title" bordered={false}>
-            Card content
-          </Card>
-        </Col>
-      </Row>
-    </div>
+    <>
+      <Navbar />
+      <div className="max-w-7xl mx-auto pt-20 px-6">
+        <HeroSection />
+        <FeatureSection />
+        <Workflow />
+        <ContactSection  />
+        <Footer />
+      </div>
+    </>
   );
 };
+
 export default HomePage;
