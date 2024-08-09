@@ -1,10 +1,8 @@
 import { MapPin } from "lucide-react";
-import { forwardRef } from "react";
 
-
-const ContactSection = forwardRef((props, ref) => {
+const ContactSection = () => {
   return (
-    <div ref={ref} id="contacto" className="mt-20 border-b border-neutral-800 pb-10">
+    <div id="contacto" className="mt-20 border-b border-neutral-800 pb-10">
       <h2 className="text-3xl sm:text-5xl lg:text-6xl text-center mt-6 tracking-wide">
         Contacta con{" "}
         <span className="bg-gradient-to-r from-yellow-700 to-[#1b5d3c] text-transparent bg-clip-text">
@@ -28,13 +26,13 @@ const ContactSection = forwardRef((props, ref) => {
             </div>
             <div className="mb-4">
               <label className="block text-white text-sm mb-2" htmlFor="email">
-                Correo Electrónico
+                Numero telefonico
               </label>
               <input
-                id="email"
-                type="email"
+                id="tel"
+                type="text"
                 className="w-full p-3 rounded-md bg-neutral-800 text-white border border-neutral-700"
-                placeholder="Tu correo electrónico"
+                placeholder="Tu numero telefonico"
               />
             </div>
             <div className="mb-4">
@@ -80,7 +78,7 @@ const ContactSection = forwardRef((props, ref) => {
       </div>
     </div>
   );
-});
+};
 
 
 export default ContactSection;

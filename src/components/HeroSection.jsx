@@ -1,8 +1,8 @@
-import { forwardRef } from "react";
+import { Link as LinkScroll } from "react-scroll";
 
-const HeroSection = forwardRef((props, ref) => {
+const HeroSection = () => {
   return (
-    <div ref={ref} id="inicio" className="flex flex-col items-center mt-6 lg:mt-20 border-b border-neutral-800">
+    <div id="inicio" className="flex flex-col items-center mt-6 lg:mt-20 border-b border-neutral-800">
       <h1 className="text-4xl sm:text-6xl lg:text-7xl text-center tracking-wide">
         Bienvenido a
         <span className="bg-gradient-to-r from-yellow-700 to-[#1b5d3c] text-transparent bg-clip-text">
@@ -14,38 +14,26 @@ const HeroSection = forwardRef((props, ref) => {
         Únete a nuestro equipo y conduce con nosotros. En Invertaxi, proporcionamos vehículos en óptimas condiciones y ofrecemos beneficios adicionales para conductores cumplidos. ¡Empieza hoy y disfruta de todas nuestras ventajas!
       </p>
       <div className="flex justify-center my-10">
-        <a
-          href="#"
+        {/* <a
+          href="#contacto"
           className="bg-gradient-to-r from-yellow-700 to-[#1b5d3c] py-3 px-4 mx-3 rounded-md"
         >
           Postúlate Ahora
-        </a>
-        <a href="#" className="py-3 px-4 mx-3 rounded-md border">
-          Más Información
-        </a>
+        </a> */}
+        <LinkScroll
+          activeClass="active"
+          to={"contacto"}
+          spy={true}
+          smooth={true}
+          offset={-110}
+          duration={500}
+          className="bg-gradient-to-r from-yellow-700 to-[#1b5d3c] py-3 px-4 mx-3 rounded-md cursor-pointer"
+        >
+          Postúlate Ahora
+        </LinkScroll>
       </div>
-      {/* <div className="flex mt-10 justify-center">
-        <video
-          autoPlay
-          loop
-          muted
-          className="rounded-lg w-1/2 border border-orange-700 shadow-sm shadow-orange-400 mx-2 my-4"
-        >
-          <source src={video1} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <video
-          autoPlay
-          loop
-          muted
-          className="rounded-lg w-1/2 border border-orange-700 shadow-sm shadow-orange-400 mx-2 my-4"
-        >
-          <source src={video2} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div> */}
     </div>
   );
-});
+};
 
 export default HeroSection;

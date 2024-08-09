@@ -1,15 +1,16 @@
 import { Phone, MapPin } from "lucide-react";
 import { FaWhatsapp, FaFacebookF } from "react-icons/fa";
+
 const Footer = () => {
   return (
-    <footer className=" text-neutral-300 py-10 w-full">
+    <footer className="text-neutral-300 py-10 w-full">
       <div className="mx-auto px-4">
         <div className="flex flex-wrap justify-between">
           {/* Sección de Información de la Empresa */}
           <div className="w-full sm:w-1/2 lg:w-1/3 mb-8 lg:mb-0">
             <h3 className="text-xl font-semibold text-white mb-4">Invertaxi</h3>
             <p className="mb-2 flex items-center">
-              <MapPin className="mr-2" /> Calle 93 # 57 - 49
+              <MapPin className="mr-2" /> Calle 93 # 57 - 49, Bogotá, Colombia
             </p>
             <p className="mb-2 flex items-center">
               <Phone className="mr-2" /> WhatsApp: 310 233 5832
