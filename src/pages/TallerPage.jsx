@@ -211,8 +211,9 @@ const TallerPage = () => {
     try {
       setLoading(true)
       const data = await mantenimientoActiveListService();
-      setMantenimientos(data);
-      setFilteredMantenimientos(data);
+      const filteredData = data.filter(item => item.id !== 5839);
+      setMantenimientos(filteredData);
+      setFilteredMantenimientos(filteredData);
       setLoading(false)
     } catch (error) {
       console.error('Error fetching componentes', error);
